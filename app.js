@@ -28,7 +28,7 @@ var apiUser = require('./apis/user');
 app.use('/monroo/apis/user', apiUser);
 
 app.use('/', (req, res) => {
-  return res.redirect('restanorder');
+  return res.redirect('monroo');
 })
 
 app.use('/*', (req, res) => {

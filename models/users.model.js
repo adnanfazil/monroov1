@@ -13,9 +13,7 @@ const schema = new Schema({
    phone: {type: String, default: ""},
    email: {type: String, default: ""},
    token: {type: String, default: ""},
-   fcmToken: {type: String, default: ""},
-   error: {type: String, default: ""},
-   status: {type: Number, default: 0}
+   fcmToken: {type: String, default: ""}
 });
 
 
