@@ -7,7 +7,7 @@ var ProviderLook = require('../models/providerlookups');
 let upload = require("../middleware/multerUpload");
 let uploadOne = require("../middleware/multerUploadSingle");
 let jwt = require('jsonwebtoken');
-let auth = require("../middleware/auth");
+let myAuth = require("../middleware/myAuth");
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 function uuidv4() {
@@ -15,7 +15,7 @@ function uuidv4() {
 }
 
 //////////// Categories
-router.route('/addCategory').post(auth, async function(req, res) {
+router.route('/addCategory').post(myAuth, async function(req, res) {
     try{
         let body = Category(req.body);
         body.id = uuidv4();
@@ -36,7 +36,7 @@ router.route('/addCategory').post(auth, async function(req, res) {
 });
 
 
-router.route('/addCategories').post(auth,async function(req, res) {
+router.route('/addCategories').post(myAuth,async function(req, res) {
     try{
         var response = await Category.collection.insertMany(books);
         returnData(res , response);
@@ -46,7 +46,7 @@ router.route('/addCategories').post(auth,async function(req, res) {
 });
 
 
-router.route('/getCategories').post(auth,function(req, res) {
+router.route('/getCategories').post(myAuth,function(req, res) {
     try{
         Category.find(function (err, item) {
             if(err){
@@ -62,7 +62,7 @@ router.route('/getCategories').post(auth,function(req, res) {
 
 
 //////////// Sub Categories
-router.route('/addSubCategory').post(auth, async function(req, res) {
+router.route('/addSubCategory').post(myAuth, async function(req, res) {
     try{
         let body = SubCategory(req.body);
         body.id = uuidv4();
@@ -83,7 +83,7 @@ router.route('/addSubCategory').post(auth, async function(req, res) {
 });
 
 
-router.route('/addSubCategories').post(auth,async function(req, res) {
+router.route('/addSubCategories').post(myAuth,async function(req, res) {
     try{
         var response = await SubCategory.collection.insertMany(books);
         returnData(res , response);
@@ -93,7 +93,7 @@ router.route('/addSubCategories').post(auth,async function(req, res) {
 });
 
 
-router.route('/getSubCategories').post(auth,function(req, res) {
+router.route('/getSubCategories').post(myAuth,function(req, res) {
     try{
         SubCategory.find(function (err, item) {
             if(err){
@@ -108,7 +108,7 @@ router.route('/getSubCategories').post(auth,function(req, res) {
 });
 
 //////////// Educations
-router.route('/addEducation').post(auth,function(req, res) {
+router.route('/addEducation').post(myAuth,function(req, res) {
     try{
         let body = Education(req.body);
         body.id = uuidv4();
@@ -129,7 +129,7 @@ router.route('/addEducation').post(auth,function(req, res) {
 });
 
 
-router.route('/addEducations').post(auth,async function(req, res) {
+router.route('/addEducations').post(myAuth,async function(req, res) {
     try{
         var response = await Education.collection.insertMany(books);
         returnData(res , response);
@@ -139,7 +139,7 @@ router.route('/addEducations').post(auth,async function(req, res) {
 });
 
 
-router.route('/getEducations').post(auth,function(req, res) {
+router.route('/getEducations').post(myAuth,function(req, res) {
     try{
         Education.find(function (err, item) {
             if(err){
@@ -155,7 +155,7 @@ router.route('/getEducations').post(auth,function(req, res) {
 
 
 //////////// Provider Lookups
-router.route('/AddProviderLookup').post(auth,async function(req, res) {
+router.route('/AddProviderLookup').post(myAuth,async function(req, res) {
     try{
         let body = ProviderLook(req.body);
         var catID = body.catID;
@@ -183,7 +183,7 @@ router.route('/AddProviderLookup').post(auth,async function(req, res) {
 });
 
 
-router.route('/AddProviderLookups').post(auth,async function(req, res) {
+router.route('/AddProviderLookups').post(myAuth,async function(req, res) {
     try{
         var response = await ProviderLook.collection.insertMany(books);
         returnData(res , response);
@@ -193,7 +193,7 @@ router.route('/AddProviderLookups').post(auth,async function(req, res) {
 });
 
 
-router.route('/GetProviderLookups').post(auth,function(req, res) {
+router.route('/GetProviderLookups').post(myAuth,function(req, res) {
     try{
         ProviderLook.find(function (err, item) {
             if(err){
