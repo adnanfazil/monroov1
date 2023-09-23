@@ -7,7 +7,9 @@ let jwt = require('jsonwebtoken');
 let auth = require("../middleware/auth");
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-
+function uuidv4() {
+    return crypto.randomUUID();
+}
 
 router.route('/login').post(function(req, res) {
     let username = req.body.username;
@@ -60,7 +62,7 @@ router.post('/Register', upload ,async function( req, res, next) {
         let userID = body.id;
         let email = body.email;
         let phone = body.phone;
-        let oldUser = await Provider.findOne({$or:[{id: body.id}, {username: userName},{email:email},{phone:phone}]});
+        let oldUser = await Provider.findOne({$or:[{id: userID}, {username: userName},{email:email},{phone:phone}]});
         if (oldUser) {
 			return returnError(res , "This user already registered, duplicate email or mobile number");
         }else{
@@ -79,8 +81,8 @@ router.post('/Register', upload ,async function( req, res, next) {
                 if (err) {
                     return returnError(res , "Cannot Register "+ err);
                  }else{
-                    item.password = "*******"
-                    return returnData(res , item);
+                    body.password = "*******"
+                    return returnData(res , body);
 		        }
                });
         }

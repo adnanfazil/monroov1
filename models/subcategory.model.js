@@ -6,8 +6,9 @@ const schema = new Schema({
    id: {type: String , unique: true},
    name: {type: String , default: ""},
    nameAR: {type: String , default: ""},
-   nameRUS: {type: String , default: ""}
+   nameRUS: {type: String , default: ""},
+   categoryID: {type: String , default: ""},
 });
 
 
-module.exports = mongoose.model('Education', schema);
+module.exports = mongoose.model('SubCategory', schema);

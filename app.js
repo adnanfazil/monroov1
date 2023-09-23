@@ -27,6 +27,11 @@ app.use('/monroo/apis/lookups', lookups);
 var apiUser = require('./apis/user');
 app.use('/monroo/apis/user', apiUser);
 
+
+var apiProvider = require('./apis/provider');
+app.use('/monroo/apis/provider', apiProvider);
+
+
 app.use('/', (req, res) => {
   return res.redirect('monroo');
 })

@@ -48,6 +48,7 @@ router.route('/login').post(function(req, res) {
         return returnError(res , "Username not detected" );
     }
 });
+
 router.post('/Register', upload,async function( req, res, next) {
     try {
     let body = User(req.body);
