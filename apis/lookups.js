@@ -31,17 +31,25 @@ router.route('/addCategory').post(myAuth, async function(req, res) {
             throw Error("No Data Received");
         }
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
 
 router.route('/addCategories').post(myAuth,async function(req, res) {
     try{
-        var response = await Category.collection.insertMany(books);
+        var bodyList = req.body;
+        if(bodyList){
+            bodyList.forEach(element => {
+                element.id = uuidv4();
+            });
+        }else{
+            throw Error("Empty body");
+        }
+        var response = await Category.collection.insertMany(bodyList);
         returnData(res , response);
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
@@ -56,7 +64,7 @@ router.route('/getCategories').post(myAuth,function(req, res) {
             }
         });
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
@@ -66,6 +74,11 @@ router.route('/addSubCategory').post(myAuth, async function(req, res) {
     try{
         let body = SubCategory(req.body);
         body.id = uuidv4();
+        var catID = body.catID;
+        var category = await Category.findOne({id: catID});
+        if(!category){
+            throw Error("Category ID is not correct");
+        }
         if(body){
             body.save(function (err) {
                 if (err) {
@@ -78,22 +91,49 @@ router.route('/addSubCategory').post(myAuth, async function(req, res) {
             throw Error("No Data Received");
         }
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
 
 router.route('/addSubCategories').post(myAuth,async function(req, res) {
     try{
-        var response = await SubCategory.collection.insertMany(books);
+        var bodyList = req.body;
+        if(bodyList){
+            bodyList.forEach(element => {
+                element.id = uuidv4();
+            });
+        }else{
+            throw Error("Empty body");
+        }
+        var response = await SubCategory.collection.insertMany(bodyList);
         returnData(res , response);
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
 
 router.route('/getSubCategories').post(myAuth,function(req, res) {
+    try{
+        var catID = req.body.catID;
+        if(!catID){
+            throw Error("Add Category Id");
+        }
+        SubCategory.find({catID : catID},function (err, item) {
+            if(err){
+                returnError(res, err);
+            }else{
+                returnData(res, item);
+            }
+        });
+    }catch(ex){
+        returnError(res , ex.message);
+    }
+});
+
+
+router.route('/getAllSubCategories').post(myAuth,function(req, res) {
     try{
         SubCategory.find(function (err, item) {
             if(err){
@@ -103,7 +143,7 @@ router.route('/getSubCategories').post(myAuth,function(req, res) {
             }
         });
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
@@ -124,17 +164,25 @@ router.route('/addEducation').post(myAuth,function(req, res) {
             throw Error("No Data Received");
         }
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
 
 router.route('/addEducations').post(myAuth,async function(req, res) {
     try{
-        var response = await Education.collection.insertMany(books);
+        var bodyList = req.body;
+        if(bodyList){
+            bodyList.forEach(element => {
+                element.id = uuidv4();
+            });
+        }else{
+            throw Error("Empty body");
+        }
+        var response = await Education.collection.insertMany(bodyList);
         returnData(res , response);
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
@@ -149,7 +197,7 @@ router.route('/getEducations').post(myAuth,function(req, res) {
             }
         });
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
@@ -178,17 +226,25 @@ router.route('/AddProviderLookup').post(myAuth,async function(req, res) {
             throw Error("No Data Received");
         }
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
 
 router.route('/AddProviderLookups').post(myAuth,async function(req, res) {
     try{
-        var response = await ProviderLook.collection.insertMany(books);
+        var bodyList = req.body;
+        if(bodyList){
+            bodyList.forEach(element => {
+                element.id = uuidv4();
+            });
+        }else{
+            throw Error("Empty body");
+        }
+        var response = await ProviderLook.collection.insertMany(bodyList);
         returnData(res , response);
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 
@@ -203,7 +259,7 @@ router.route('/GetProviderLookups').post(myAuth,function(req, res) {
             }
         });
     }catch(ex){
-        returnError(res , ex);
+        returnError(res , ex.message);
     }
 });
 

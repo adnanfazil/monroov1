@@ -7,7 +7,7 @@ const schema = new Schema({
    name: {type: String , default: ""},
    nameAR: {type: String , default: ""},
    nameRUS: {type: String , default: ""},
-   categoryID: {type: String , default: ""},
+   catID: {type: String , default: ""},
 });
 
 
