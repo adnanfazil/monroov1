@@ -28,7 +28,7 @@ router.route('/addCategory').post(auth, async function(req, res) {
 		        }
                });
         }else{
-            throw Error("No Data Received")
+            throw Error("No Data Received");
         }
     }catch(ex){
         returnError(res , ex);
@@ -75,7 +75,7 @@ router.route('/addSubCategory').post(auth, async function(req, res) {
 		        }
                });
         }else{
-            throw Error("No Data Received")
+            throw Error("No Data Received");
         }
     }catch(ex){
         returnError(res , ex);
@@ -121,7 +121,7 @@ router.route('/addEducation').post(auth,function(req, res) {
 		        }
                });
         }else{
-            throw Error("No Data Received")
+            throw Error("No Data Received");
         }
     }catch(ex){
         returnError(res , ex);
@@ -158,12 +158,12 @@ router.route('/getEducations').post(auth,function(req, res) {
 router.route('/AddProviderLookup').post(auth,async function(req, res) {
     try{
         let body = ProviderLook(req.body);
-        var catID = body.catID
+        var catID = body.catID;
         var subCatID = body.subCatID;
         var category = await Category.find({id: catID});
         var subCategory = await SubCategory.find({id: subCatID});
         if(!category || !subCategory){
-            throw Error("Cat ID or Sub Cat ID not exist" + !category + !subCategory);
+            throw Error("Cat ID or Sub Cat ID not exist " + !category + !subCategory);
         }
         body.id = uuidv4();
         if(body){
@@ -175,7 +175,7 @@ router.route('/AddProviderLookup').post(auth,async function(req, res) {
 		        }
                });
         }else{
-            throw Error("No Data Received")
+            throw Error("No Data Received");
         }
     }catch(ex){
         returnError(res , ex);
