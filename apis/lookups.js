@@ -235,7 +235,7 @@ router.route('/AddProviderLookups').post(myAuth,async function(req, res) {
     try{
         var bodyList = req.body;
         if(bodyList){
-            bodyList.forEach(element => {
+            await bodyList.forEach(element => {
                 element.id = uuidv4();
             });
         }else{

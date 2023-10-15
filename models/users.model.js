@@ -14,7 +14,8 @@ const schema = new Schema({
    email: {type: String, default: ""},
    about: {type: String, default: ""},
    companyName: {type: String, default: ""},
-   intrestedList: {type: [String], default: ""}, // list of sub categories ids // set after register to add list of intrest
+   intrestedList: {type: [String], default: ""}, // list of  categories ids // set after register to add list of intrest
+   intrestedList: {type: [String], default: ""}, // list of  categories ids // set after register to add list of intrest
    token: {type: String, default: ""},
    fcmToken: {type: String, default: ""}
 });
