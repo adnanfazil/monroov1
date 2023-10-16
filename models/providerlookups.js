@@ -4,12 +4,11 @@ var Schema = mongoose.Schema;
 
 const schema = new Schema({
    id: {type: String , unique: true}, // false hide - true show
-   catID: {type: Boolean , default: false},
-   subCatID: {type: Boolean , default: false},
+   catID: {type: String , default: ""},
+   subCatID: {type: String , default: "" , unique: true},
    fname: {type: Boolean , default: false},
    lname: {type: Boolean , default: false},
    gender: {type: Boolean, default: false}, 
-   isActive: {type: Boolean, default: false},
    username: {type: Boolean, default: false},
    password: {type: Boolean, default: false},
    registerDate: {type: Boolean, default: false},
@@ -42,9 +41,7 @@ const schema = new Schema({
    musicalInstruments: {type: Boolean, default: false},
    musicGenres: {type: Boolean, default: false},
    specialSkills: {type: Boolean, default: false},
-   demoReel: {type: Boolean, default: false},
-   token: {type: Boolean, default: false},
-   fcmToken: {type: Boolean, default: false}
+   demoReel: {type: Boolean, default: false}
 
 });
 

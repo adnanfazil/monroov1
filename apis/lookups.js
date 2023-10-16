@@ -231,7 +231,7 @@ router.route('/AddProviderLookup').post(myAuth,async function(req, res) {
 });
 
 
-router.route('/AddProviderLookups').post(myAuth,async function(req, res) {
+router.route('/AddCollectionProviderLookups').post(myAuth,async function(req, res) {
     try{
         var bodyList = req.body;
         if(bodyList){
@@ -249,7 +249,54 @@ router.route('/AddProviderLookups').post(myAuth,async function(req, res) {
 });
 
 
+router.route('/UpdateCategoyInProvide').post(myAuth,function(req, res) {
+    try{
+        const  {catID, subCatID } = req.body;
+        if(!subCatID || !catID){
+            returnError(res, "cat id or sub cat idnot sent");
+            return;
+        }
+        ProviderLook.findOne({subCatID: subCatID} ,function (err, item) {
+            if(err){
+                returnError(res, err);
+            }else{
+                if(item){
+                    item.catID = catID; 
+                    item.save();
+                    returnData(res, item);
+                }else{
+                    returnError(res, "item not found");
+                }
+            }
+        });
+    }catch(ex){
+        returnError(res , ex.message);
+    }
+});
+
 router.route('/GetProviderLookups').post(myAuth,function(req, res) {
+    try{
+        const { catID, subCatID } = req.body;
+        if(!catID || !subCatID){
+            returnError(res, "cat id or sub cat idnot sent");
+            return;
+        }
+        ProviderLook.findOne({catID: catID , subCatID: subCatID} ,function (err, item) {
+            if(err){
+                returnError(res, err);
+            }else{
+                if(item){
+                    returnData(res, item);
+                }else{
+                    returnError(res, "item not found");
+                }
+            }
+        });
+    }catch(ex){
+        returnError(res , ex.message);
+    }
+});
+router.route('/GetAllProviderLookups').post(myAuth,function(req, res) {
     try{
         ProviderLook.find(function (err, item) {
             if(err){
