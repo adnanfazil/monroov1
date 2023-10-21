@@ -58,7 +58,7 @@ router.post('/Register', upload, async function (req, res, next) {
 
         const { userName, userID, email, phone } = body;
         let oldUser = await User.findOne({ $or: [{ id: body.id }, { username: userName }, { email: email }, { phone: phone }] });
-        if (!oldUser)
+        if (oldUser)
             return returnError(res, "This user already registered, duplicate email or mobile number");
 
         let encryptedPassword = await bcrypt.hash(body.password, 10);

@@ -4,10 +4,11 @@ var http = require('http');
 const mongoose = require('mongoose');
 
 const port = process.argv[2] || process.env.PORT || 3000;
+const databaseURL = process.env.DATABASE_URL;
 
 app.set('port', port);
 
- mongoose.connect('mongodb://localhost:27017/monroo', {useNewUrlParser: true  });
+ mongoose.connect(databaseURL, {useNewUrlParser: true  });
  //mongoose.connect('mongodb://username:password@localhost:27017/monroo', {useNewUrlParser: true  });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -21,7 +22,7 @@ db.once('open', function() {
 var server = http.createServer(app);
 
 server.listen(port, () => {
-    console.log('Server running at http://:${port}/');
+    console.log(`Server running at http://localhost:${port}/`);
     });
      server.on('error', onError);
     server.on('listening', onListening);
