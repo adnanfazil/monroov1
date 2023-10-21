@@ -49,22 +49,24 @@ router.route('/login').post(function (req, res) {
     }
 });
 
-router.post('/Register', upload, async function (req, res, next) {
+router.post('/Register', async function (req, res, next) {
     try {
-        let body = User(req.body);
-        body.id = uuidv4();
-        console.log(body);
+        const body = User(req.body);
+        console.log({body});
+        
+        const userID = crypto.randomUUID(); 
+        body.id = userID;
         if (!body) return returnError(res, "Info not detected");
 
-        const { userName, userID, email, phone } = body;
-        let oldUser = await User.findOne({ $or: [{ id: body.id }, { username: userName }, { email: email }, { phone: phone }] });
+        const { userName: username, email, phone } = body;
+        let oldUser = await User.findOne({ $or: [{ id: body.id }, { username: username }, { email: email }, { phone: phone }] });
         if (oldUser)
             return returnError(res, "This user already registered, duplicate email or mobile number");
 
         let encryptedPassword = await bcrypt.hash(body.password, 10);
         body.password = encryptedPassword;
         let token = jwt.sign(
-            { user_id: userID, user_name: userName, email },
+            { user_id: userID, user_name: username, email },
             process.env.JWT_KEY,
             {
                 expiresIn: "24h",
