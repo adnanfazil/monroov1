@@ -54,7 +54,7 @@ router.route('/login').post(function(req, res) {
 
 router.post('/Register', upload ,async function( req, res, next) {
     try {
-    let body = User(req.body);
+    let body = Provider(req.body);
     body.id = uuidv4();
     console.log(body);
     if(body){

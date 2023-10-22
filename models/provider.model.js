@@ -1,8 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var musicalInstruments = require('../models/musicalInstruments.model').schema;
-var musicGenres = require('../models/musicgeners.model').schema;
+
 var subCategories = require('../models/subcategory.model').schema;
 
 
@@ -11,6 +10,7 @@ const schema = new Schema({
    id: {type: String , unique: true},
    catID: {type: String , default: ""},
    subCatID: {type: [subCategories] , default: []},
+   profilePic: {type: String , default: ""},
    fname: {type: String , default: ""},
    lname: {type: String , default: ""},
    gender: {type: Number, default: 0}, // 1: Male , 2: Female
@@ -44,8 +44,8 @@ const schema = new Schema({
    isAmodel: {type: Boolean, default: false}, // to show four types of images (face close shot, waist up, shouder up , full lentgh )
    oneMinuteVideo: {type: String, default: ""},
    audios: {type: [String], default: []},
-   musicalInstruments: {type: [musicalInstruments], default: []},
-   musicGenres: {type: [musicGenres], default: []},
+   musicalInstruments: {type: [Number], default: []},
+   musicGenres: {type: [Number], default: []},
    specialSkills: {type: String, default: ""},
    demoReel: {type: String, default: ""},
    token: {type: String, default: ""},
