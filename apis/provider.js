@@ -2,12 +2,6 @@ var express = require('express');
 var router = express.Router();
 var Provider = require('../models/provider.model');
 let uploadAll = require("../middleware/uploadAll");
-let uploadVideos = require("../middleware/uploadVideos");
-let uploadOneMinute = require("../middleware/uploadOneVideo");
-let uploadAudios = require("../middleware/uploadAudios");
-let uploadResume = require("../middleware/uploadResume");
-let uploadPortfolio = require("../middleware/uploadPortfolio");
-let uploadReel = require("../middleware/uploadReel");
 let jwt = require('jsonwebtoken');
 let auth = require("../middleware/auth");
 let bcrypt = require('bcryptjs');
@@ -59,34 +53,34 @@ router.route('/login').post(function(req, res) {
 
 router.post('/Register', uploadAll ,async function( req, res, next) {
     try {
-       const env = process.env;
+    const DOMAIN = process.env.DOMAIN_ME;
     let body = Provider(JSON.parse(req.body.data));
     const {images , videos , audios , onevideo , reel , resumeCV , portfolio} = req.files;
     if(images){
         let list = [];
         for(const item of images){
-            list.push(env.DOMAIN_ME+'uploads/images/'+item.filename);
+            list.push(DOMAIN+'uploads/images/'+item.filename);
         }
         body.photos = list;
     }
     if(videos){
         let list = [];
         for(const item of videos){
-            list.push(env.DOMAIN_ME+'uploads/videos/'+item.filename);
+            list.push(DOMAIN+'uploads/videos/'+item.filename);
         }
         body.videos = list;
     }
     if(audios){
         let list = [];
         for(const item of audios){
-            list.push(env.DOMAIN_ME+'uploads/audios/'+item.filename);
+            list.push(DOMAIN+'uploads/audios/'+item.filename);
         }
         body.videos = list;
     }
     if(onevideo){
         let list = [];
         for(const item of onevideo){
-            list.push(env.DOMAIN_ME+'uploads/onevideo/'+item.filename);
+            list.push(DOMAIN+'uploads/onevideo/'+item.filename);
         }
         if(list)
             body.oneMinuteVideo = list[0]
@@ -94,7 +88,7 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
     if(reel){
         let list = [];
         for(const item of reel){
-            list.push(env.DOMAIN_ME+'uploads/reel/'+item.filename);
+            list.push(DOMAIN+'uploads/reel/'+item.filename);
         }
         if(list)
             body.demoReel = list[0]
@@ -102,7 +96,7 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
     if(resumeCV){
         let list = [];
         for(const item of resumeCV){
-            list.push(env.DOMAIN_ME+'uploads/resumeCV/'+item.filename);
+            list.push(DOMAIN+'uploads/resumeCV/'+item.filename);
         }
         if(list)
             body.resume = list[0]
@@ -110,7 +104,7 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
     if(portfolio){
         let list = [];
         for(const item of portfolio){
-            list.push(env.DOMAIN_ME+'uploads/portfolio/'+item.filename);
+            list.push(DOMAIN+'uploads/portfolio/'+item.filename);
         }
         if(list)
             body.portfolio = list[0]
@@ -147,7 +141,7 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
         return returnError(res , "Info not detected");
     }
             
-  } catch (error) {
+ } catch (error) {
     return returnError(res , "Error "+error);
   }
 });
