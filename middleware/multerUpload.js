@@ -40,7 +40,7 @@ const upload = async (req, res , next) => {
         if (err){
           console.log(err)
           req.files = null;
-          next(err)
+          next(err.message);
           // res.json({ error: '' + err });
         }
         if (req.files == undefined) {
@@ -58,7 +58,7 @@ const upload = async (req, res , next) => {
       console.log(error)
 
       req.files = null;
-      next(error);
+      next(error.message);
       // res.status(500).send({
       //   message: `Could not upload the file: ${req.file.originalname}. ${err}`,
       // });
