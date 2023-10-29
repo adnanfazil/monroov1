@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/users.model');
+var Event = require('../models/event.model');
 let upload = require("../middleware/multerUpload");
 let uploadOne = require("../middleware/multerUploadSingle");
 let jwt = require('jsonwebtoken');
@@ -88,6 +89,25 @@ router.post('/Register', async function (req, res, next) {
     }
 });
 
+router.post('/CreateEvent', async function (req, res) {
+    try{
+        const event = Event(req.body);
+        if(event){
+            event.id = crypto.randomUUID();
+            event.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , event);
+                }
+            });
+        }else{
+            return returnError(res, "Data Not Correct");
+        }
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
 
 function returnError(res, error) {
     return res.status(203).send({ status: 203, data: error });
