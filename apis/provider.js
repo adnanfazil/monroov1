@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Provider = require('../models/provider.model');
 let uploadAll = require("../middleware/uploadAll");
+var Event = require('../models/event.model');
 let jwt = require('jsonwebtoken');
 let auth = require("../middleware/auth");
 let bcrypt = require('bcryptjs');
@@ -157,6 +158,20 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
  } catch (error) {
     return returnError(res , "Error "+error);
   }
+});
+
+router.post('/GetEvents', async function (req, res) {
+    try{
+        Event.find({},function(err , items){
+            if(err){
+                return returnError(res, "Failed"+err);
+            }else {
+                return returnData(res, items);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
 });
 
 function returnError(res , error){
