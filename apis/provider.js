@@ -18,7 +18,6 @@ router.route('/login').post(function(req, res) {
             if (item && item.password) {
                 let password = req.body.password;
                 if (!bcrypt.compareSync(password, item.password)){
-                    modelError.error = "Wrong password";
                     return returnError(res , "Wrong password");
                 }
                 let email = item.email;
@@ -62,6 +61,8 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
             list.push(DOMAIN+'uploads/images/'+item.filename);
         }
         body.photos = list;
+    }else{
+        body.photos = [];
     }
     if(videos){
         let list = [];
@@ -69,13 +70,17 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
             list.push(DOMAIN+'uploads/videos/'+item.filename);
         }
         body.videos = list;
+    }else{
+        body.videos = [];
     }
     if(audios){
         let list = [];
         for(const item of audios){
             list.push(DOMAIN+'uploads/audios/'+item.filename);
         }
-        body.videos = list;
+        body.audios = list;
+    }else{
+        body.audios = [];
     }
     if(onevideo){
         let list = [];
@@ -84,6 +89,8 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
         }
         if(list)
             body.oneMinuteVideo = list[0]
+    }else{
+        body.oneMinuteVideo = "";
     }
     if(reel){
         let list = [];
@@ -92,6 +99,8 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
         }
         if(list)
             body.demoReel = list[0]
+    }else{
+        body.demoReel = "";
     }
     if(resumeCV){
         let list = [];
@@ -100,6 +109,8 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
         }
         if(list)
             body.resume = list[0]
+    }else{
+        body.resume = "";
     }
     if(portfolio){
         let list = [];
@@ -108,6 +119,8 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
         }
         if(list)
             body.portfolio = list[0]
+    }else{
+        body.portfolio = "";
     }
     body.id = uuidv4();
     console.log(body);
@@ -147,10 +160,12 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
 });
 
 function returnError(res , error){
+    console.log(error);
     return res.status(203).send({status: 203 , data: error});
 }
 
 function returnData(res , data){
+    console.log(data);
     return res.status(200).send({status: 200 , data: data});
 }
 

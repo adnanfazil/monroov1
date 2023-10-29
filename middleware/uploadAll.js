@@ -11,7 +11,8 @@ let storage = multer.diskStorage({
         cb(null, filePath)
      },
      filename:(req,file,cb)=>{
-        cb(null, file.fieldname+Date.now()+'.'+mime.extension(file.mimetype));
+      let ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
+        cb(null, file.fieldname+Date.now()+ext);
      }
 });
 

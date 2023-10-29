@@ -28,7 +28,7 @@ const schema = new Schema({
    countryOfResidence: {type: String, default: ""},
    spokenLanguage: {type: String, default: ""},
    experience: {type: String, default: ""},
-   visaType: {type: String, default: ""},
+   visaType: {type: Number, default: ""},
    instagram: {type: String, default: ""},
    photos: {type: [String], default: []},
    introductionVideoLink: {type: String, default: ""},
