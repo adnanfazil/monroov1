@@ -14,7 +14,7 @@ router.route('/login').post(function (req, res) {
     const { username, fcmToken } = req.body;
 
     if (username) {
-        User.findOne({ username: username }, function (err, item) {
+        User.findOne({$or :[{ username: username },{ email: username }]}, function (err, item) {
             if (item && item.password) {
                 let password = req.body.password;
                 if (!bcrypt.compareSync(password, item.password)) {
@@ -79,8 +79,8 @@ router.post('/Register', async function (req, res, next) {
             if (err) {
                 return returnError(res, "Cannot Register " + err);
             } else {
-                item.password = "*******"
-                return returnData(res, item);
+                body.password = "*******"
+                return returnData(res, body);
             }
         });
 
@@ -89,7 +89,7 @@ router.post('/Register', async function (req, res, next) {
     }
 });
 
-router.post('/CreateEvent', async function (req, res) {
+router.post('/CreateEvent', auth, async function (req, res) {
     try{
         const event = Event(req.body);
         if(event){
