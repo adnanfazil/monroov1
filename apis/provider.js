@@ -5,13 +5,14 @@ let uploadAll = require("../middleware/uploadAll");
 var Event = require('../models/event.model');
 let jwt = require('jsonwebtoken');
 let auth = require("../middleware/auth");
+let myAuth = require("../middleware/myAuth");
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 function uuidv4() {
     return crypto.randomUUID();
 }
 
-router.route('/login').post(function(req, res) {
+router.route('/login').post(myAuth ,function(req, res) {
     let username = req.body.username;
     let fcmToken = req.body.fcmToken;
     if (username){

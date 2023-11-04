@@ -1,16 +1,18 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/users.model');
+var Provider = require('../models/provider.model');
 var Event = require('../models/event.model');
 let upload = require("../middleware/multerUpload");
 let uploadOne = require("../middleware/multerUploadSingle");
 let jwt = require('jsonwebtoken');
 let auth = require("../middleware/auth");
+let myAuth = require("../middleware/myAuth");
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
 
-router.route('/login').post(function (req, res) {
+router.route('/login').post(myAuth,function (req, res) {
     const { username, fcmToken } = req.body;
 
     if (username) {
@@ -20,14 +22,7 @@ router.route('/login').post(function (req, res) {
                 if (!bcrypt.compareSync(password, item.password)) {
                     return returnError(res, "Wrong password");
                 }
-                let email = item.email;
-                let token = jwt.sign(
-                    { user_id: item.id, user_name: username, email },
-                    process.env.JWT_KEY,
-                    {
-                        expiresIn: "24h",
-                    }
-                );
+                let token = getToken(item.id , item.email , item.country);
                 item.token = token;
                 item.fcmToken = fcmToken;
                 item.status = 200;
@@ -50,7 +45,7 @@ router.route('/login').post(function (req, res) {
     }
 });
 
-router.post('/Register', async function (req, res, next) {
+router.post('/Register',myAuth, async function (req, res, next) {
     try {
         const body = User(req.body);
         console.log({body});
@@ -66,14 +61,7 @@ router.post('/Register', async function (req, res, next) {
 
         let encryptedPassword = await bcrypt.hash(body.password, 10);
         body.password = encryptedPassword;
-        let token = jwt.sign(
-            { user_id: userID, user_name: username, email },
-            process.env.JWT_KEY,
-            {
-                expiresIn: "24h",
-            }
-        );
-
+        let token = getToken(userID , body.email , body.country);
         body.token = token;
         body.save(function (err) {
             if (err) {
@@ -92,6 +80,8 @@ router.post('/Register', async function (req, res, next) {
 router.post('/CreateEvent', auth, async function (req, res) {
     try{
         const event = Event(req.body);
+        event.userID = req.user.userID;
+        event.country = req.user.country;
         if(event){
             event.id = crypto.randomUUID();
             event.save(function(err){
@@ -109,6 +99,37 @@ router.post('/CreateEvent', auth, async function (req, res) {
     }
 });
 
+
+router.post('/ListProviders', auth, async function (req, res) {
+    try{
+        const userID = req.user.userID;
+        const user = await User.findOne({id: userID});
+        if(!user){
+           return returnError(res , "User info not detected");
+        }
+        Provider.find({catID: {$in: user.intrestedList} }, function(err, items) {
+            if(err){
+                return returnError(res , err);
+            }else{
+                return returnData(res , items);
+            }
+        } );
+        
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
+
+function getToken(id , email , country){
+    return jwt.sign(
+        { userID: id, email: email, country: country },
+        process.env.JWT_KEY,
+        {
+            expiresIn: "24h",
+        }
+    );
+}
 function returnError(res, error) {
     return res.status(203).send({ status: 203, data: error });
 }
