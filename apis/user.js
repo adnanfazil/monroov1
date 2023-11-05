@@ -99,6 +99,21 @@ router.post('/CreateEvent', auth, async function (req, res) {
     }
 });
 
+router.post('/GetUserEvents',auth, function (req, res) {
+    try{
+        const userID = req.user.userID;
+        Event.find({userID: userID},function(err , items){
+            if(err){
+                return returnError(res, "Failed"+err);
+            }else {
+                return returnData(res, items);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
+});
+
 
 router.post('/ListProviders', auth, async function (req, res) {
     try{
