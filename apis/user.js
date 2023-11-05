@@ -3,6 +3,7 @@ var router = express.Router();
 var User = require('../models/users.model');
 var Provider = require('../models/provider.model');
 var Event = require('../models/event.model');
+var Message = require('../models/message.model');
 let upload = require("../middleware/multerUpload");
 let uploadOne = require("../middleware/multerUploadSingle");
 let jwt = require('jsonwebtoken');
@@ -89,6 +90,34 @@ router.post('/CreateEvent', auth, async function (req, res) {
                     return returnError(res, "Failed" + err);
                 }else{
                     return returnData(res , event);
+                }
+            });
+        }else{
+            return returnError(res, "Data Not Correct");
+        }
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
+
+router.post('/RequestEvent', auth, async function (req, res) {
+    try{
+        const eventID = req.body.eventID;
+        const providerID = req.body.providerID;
+        if(providerID && eventID){
+            var message = Message();
+            message.id = crypto.randomUUID();
+            message.msg = "";
+            message.type = 1;
+            message.providerID = providerID;
+            message.eventID = eventID;
+            message.userID = req.user.userID;
+            message.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , true);
                 }
             });
         }else{
