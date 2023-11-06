@@ -101,32 +101,6 @@ router.post('/CreateEvent', auth, async function (req, res) {
 });
 
 
-router.post('/RequestEvent', auth, async function (req, res) {
-    try{
-        const eventID = req.body.eventID;
-        const providerID = req.body.providerID;
-        if(providerID && eventID){
-            var message = Message();
-            message.id = crypto.randomUUID();
-            message.msg = "";
-            message.type = 1;
-            message.providerID = providerID;
-            message.eventID = eventID;
-            message.userID = req.user.userID;
-            message.save(function(err){
-                if(err){
-                    return returnError(res, "Failed" + err);
-                }else{
-                    return returnData(res , true);
-                }
-            });
-        }else{
-            return returnError(res, "Data Not Correct");
-        }
-    }catch(err){
-        return returnError(res, "Data Not Correct");
-    }
-});
 
 router.post('/GetUserEvents',auth, function (req, res) {
     try{
@@ -165,6 +139,62 @@ router.post('/ListProviders', auth, async function (req, res) {
 });
 
 
+
+router.post('/RequestEvent', auth, async function (req, res) {
+    try{
+        const eventID = req.body.eventID;
+        const providerID = req.body.providerID;
+        if(providerID && eventID){
+            var message = Message();
+            message.id = crypto.randomUUID();
+            message.msg = "";
+            message.type = 1;
+            message.providerID = providerID;
+            message.eventID = eventID;
+            message.userID = req.user.userID;
+            message.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , true);
+                }
+            });
+        }else{
+            return returnError(res, "Data Not Correct");
+        }
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
+router.post('/getMessagesProfiles', auth, function (req, res) {
+    try{
+        const userID = req.user.userID;
+        Message.find({userId: userID}, async function(err , items){
+            if(err){
+                returnError(res , err);
+            }else{
+
+                const ids = items.map(({ providerID }) => providerID);
+                const filtered = items.filter(({ providerID }, index) =>
+                !ids.includes(providerID, index + 1));
+                var response = [];
+                for(const item of filtered){
+                    const sender = await Provider.findOne({id: item.providerID});
+                    var data = {};
+                    data.messageID = item.id;
+                    data.senderID = item.providerID;
+                    data.senderName = sender.fname;
+                    data.senderPhoto = sender.profilePic;
+                    response.push(data);
+                }5
+                returnData(res , response);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
 function getToken(id , email , country){
     return jwt.sign(
         { userID: id, email: email, country: country },

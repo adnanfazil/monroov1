@@ -1,11 +1,13 @@
 var express = require('express');
 var router = express.Router();
 var Provider = require('../models/provider.model');
+var User = require('../models/users.model');
 let uploadAll = require("../middleware/uploadAll");
 var Event = require('../models/event.model');
 let jwt = require('jsonwebtoken');
 let auth = require("../middleware/auth");
 let myAuth = require("../middleware/myAuth");
+var Message = require('../models/message.model');
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 function uuidv4() {
@@ -22,14 +24,7 @@ router.route('/login').post(myAuth ,function(req, res) {
                 if (!bcrypt.compareSync(password, item.password)){
                     return returnError(res , "Wrong password");
                 }
-                let email = item.email;
-                let token = jwt.sign(
-                    { user_id: item.id, user_name: username , email },
-                        process.env.JWT_KEY,
-                    {
-                       expiresIn: "24h",
-                    }
-                   );
+                let token = getToken(item.id , item.email , item.countryOfResidence);
                 item.token = token;
                 item.fcmToken = fcmToken;
                 item.status = 200;
@@ -134,14 +129,7 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
         }else{
             let encryptedPassword = await bcrypt.hash(body.password, 10);
             body.password = encryptedPassword;
-            let token = jwt.sign(
-                { user_id: id, user_name: username , email },
-                    process.env.JWT_KEY,
-                {
-                   expiresIn:  "24h",
-                }
-               );
-
+            let token = getToken(body.id , body.email , body.countryOfResidence);
             body.token = token;
             body.save(function (err) {
                 if (err) {
@@ -175,6 +163,52 @@ router.post('/GetEvents', async function (req, res) {
     }
 });
 
+
+
+router.post('/getMessagesProfiles', auth, function (req, res) {
+    try{
+        const userID = req.user.userID;
+        Message.find({providerID: userID}, async function(err , items){
+            if(err){
+                returnError(res , err);
+            }else{
+
+                const ids = items.map(({ userID }) => userID);
+                const filtered = items.filter(({ userID }, index) =>
+                !ids.includes(userID, index + 1));
+                var response = [];
+                for(const item of filtered){
+                    const sender = await User.findOne({id: item.userID});
+                    var data = {};
+                    data.messageID = item.id;
+                    data.senderID = item.userID;
+                    data.senderName = sender.name;
+                    data.senderPhoto = sender.profilePic;
+                    response.push(data);
+                }5
+                returnData(res , response);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
+router.post('/getAllProvider', function (req, res) {
+    Provider.find({} , function(err, items){
+        returnData(res , items);
+    });
+});
+
+function getToken(id , email , country){
+    return jwt.sign(
+        { userID: id, email: email, country: country },
+        process.env.JWT_KEY,
+        {
+            expiresIn: "24h",
+        }
+    );
+}
 function returnError(res , error){
     console.log(error);
     return res.status(203).send({status: 203 , data: error});
