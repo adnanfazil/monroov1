@@ -194,6 +194,29 @@ router.post('/getMessagesProfiles', auth, function (req, res) {
     }
 });
 
+
+router.post('/getDetailedMessages', auth,async function (req, res) {
+    try{
+        const userID = req.user.userID;
+        const employer = req.body.userID;
+        Message.find({providerID: userID , userID: employer}, async function(err , items){
+            if(err){
+                returnError(res , err);
+            }else{
+                for (var item of items){
+                    if(item.type === 1){
+                        const event = await Event.findOne({id: item.eventID});
+                        item.eventObj = event;
+                    }
+                }
+                returnData(res , items);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
 router.post('/getAllProvider', function (req, res) {
     Provider.find({} , function(err, items){
         returnData(res , items);

@@ -152,6 +152,7 @@ router.post('/RequestEvent', auth, async function (req, res) {
             message.providerID = providerID;
             message.eventID = eventID;
             message.userID = req.user.userID;
+            message.senderID = req.user.userID;
             message.save(function(err){
                 if(err){
                     return returnError(res, "Failed" + err);
@@ -189,6 +190,27 @@ router.post('/getMessagesProfiles', auth, function (req, res) {
                     response.push(data);
                 }5
                 returnData(res , response);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+router.post('/getDetailedMessages', auth,async function (req, res) {
+    try{
+        const userID = req.user.userID;
+        const providerID = req.body.providerID;
+        Message.find({providerID: providerID , userID: userID}, async function(err , items){
+            if(err){
+                returnError(res , err);
+            }else{
+                for (var item of items){
+                    if(item.type === 1){
+                        const event = await Event.findOne({id: item.eventID});
+                        item.eventObj = event;
+                    }
+                }
+                returnData(res , items);
             }
         });
     }catch(err){

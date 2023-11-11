@@ -9,6 +9,7 @@ const schema = new Schema({
    createdDate: {type: String , default: ""},
    eventDate: {type: String , default: ""},
    userID: {type: String , default: ""},
+   providerID: {type: String , default: ""},
    catID: {type: String , default: ""},
    subCatID: {type: String , default: ""},
    duration: {type: String , default: ""},
