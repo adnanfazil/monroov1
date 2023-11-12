@@ -240,6 +240,25 @@ router.post('/sendMessage', auth, async function (req, res) {
     }
 });
 
+
+
+
+router.post('/getBookings', auth,async function (req, res) {
+    try{
+        const currentTimestampInMilliseconds = new Date().getTime();
+        const providerID = req.user.providerID;
+        Event.find({providerID: providerID}, async function(err , items){
+            if(err){
+                returnError(res , err);
+            }else{
+                returnData(res , items);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
 router.post('/getAllProvider', function (req, res) {
     Provider.find({} , function(err, items){
         returnData(res , items);
