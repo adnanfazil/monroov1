@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var event = require('../models/event.model').schema;
+var event = require('../models/eventMsg.model').schema;
 
 
 const schema = new Schema({

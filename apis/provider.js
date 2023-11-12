@@ -217,6 +217,29 @@ router.post('/getDetailedMessages', auth,async function (req, res) {
     }
 });
 
+
+router.post('/sendMessage', auth, async function (req, res) {
+    try{
+        const message = Message(req.body); 
+        if(message){
+            message.id = crypto.randomUUID();
+            message.providerID = req.user.userID;
+            message.senderID = req.user.userID;
+            message.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , message);
+                }
+            });
+        }else{
+            return returnError(res, "Data Not Correct");
+        }
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
 router.post('/getAllProvider', function (req, res) {
     Provider.find({} , function(err, items){
         returnData(res , items);

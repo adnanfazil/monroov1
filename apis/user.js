@@ -217,6 +217,29 @@ router.post('/getDetailedMessages', auth,async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
+
+
+router.post('/sendMessage', auth, async function (req, res) {
+    try{
+        const message = Message(req.body); 
+        if(message){
+            message.id = crypto.randomUUID();
+            message.userID = req.user.userID;
+            message.senderID = req.user.userID;
+            message.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , message);
+                }
+            });
+        }else{
+            return returnError(res, "Data Not Correct");
+        }
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
 function getToken(id , email , country){
     return jwt.sign(
         { userID: id, email: email, country: country },
