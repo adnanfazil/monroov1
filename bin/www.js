@@ -8,7 +8,8 @@ const databaseURL = process.env.DATABASE_URL;
 
 app.set('port', port);
 
- mongoose.connect(databaseURL, {useNewUrlParser: true  });
+//  mongoose.connect(databaseURL, {useNewUrlParser: true  });
+ mongoose.connect('mongodb://localhost:27017/monroo', {useNewUrlParser: true  });
  //mongoose.connect('mongodb://username:password@localhost:27017/monroo', {useNewUrlParser: true  });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));

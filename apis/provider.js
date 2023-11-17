@@ -163,8 +163,6 @@ router.post('/GetEvents', async function (req, res) {
     }
 });
 
-
-
 router.post('/getMessagesProfiles', auth, function (req, res) {
     try{
         const userID = req.user.userID;
@@ -194,7 +192,6 @@ router.post('/getMessagesProfiles', auth, function (req, res) {
     }
 });
 
-
 router.post('/getDetailedMessages', auth,async function (req, res) {
     try{
         const userID = req.user.userID;
@@ -216,7 +213,6 @@ router.post('/getDetailedMessages', auth,async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
-
 
 router.post('/sendMessage', auth, async function (req, res) {
     try{
@@ -240,13 +236,10 @@ router.post('/sendMessage', auth, async function (req, res) {
     }
 });
 
-
-
-
 router.post('/getBookings', auth,async function (req, res) {
     try{
         const currentTimestampInMilliseconds = new Date().getTime();
-        const providerID = req.user.providerID;
+        const providerID = req.user.userID;
         Event.find({providerID: providerID}, async function(err , items){
             if(err){
                 returnError(res , err);
@@ -258,6 +251,10 @@ router.post('/getBookings', auth,async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
+
+
+
+
 
 router.post('/getAllProvider', function (req, res) {
     Provider.find({} , function(err, items){
@@ -278,7 +275,6 @@ function returnError(res , error){
     console.log(error);
     return res.status(203).send({status: 203 , data: error});
 }
-
 function returnData(res , data){
     console.log(data);
     return res.status(200).send({status: 200 , data: data});

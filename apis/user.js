@@ -240,6 +240,24 @@ router.post('/sendMessage', auth, async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
+
+
+router.post('/getBookings', auth,async function (req, res) {
+    try{
+        const currentTimestampInMilliseconds = new Date().getTime();
+        const userID = req.user.userID;
+        Event.find({userID: userID}, async function(err , items){
+            if(err){
+                returnError(res , err);
+            }else{
+                returnData(res , items);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
 function getToken(id , email , country){
     return jwt.sign(
         { userID: id, email: email, country: country },
