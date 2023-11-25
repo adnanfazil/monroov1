@@ -120,10 +120,21 @@ router.post('/GetUserEvents',auth, function (req, res) {
 
 router.post('/ListProviders', auth, async function (req, res) {
     try{
+        const isAll = req.body.isAll;
         const userID = req.user.userID;
         const user = await User.findOne({id: userID});
         if(!user){
            return returnError(res , "User info not detected");
+        }
+        if(isAll){
+            Provider.find({}, function(err, items) {
+                if(err){
+                    return returnError(res , err);
+                }else{
+                    return returnData(res , items);
+                }
+            } );
+            return;
         }
         Provider.find({catID: {$in: user.intrestedList} }, function(err, items) {
             if(err){
