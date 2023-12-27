@@ -40,9 +40,9 @@ router.route('/addCategories').post(myAuth,async function(req, res) {
     try{
         var bodyList = req.body;
         if(bodyList){
-            bodyList.forEach(element => {
-                element.id = uuidv4();
-            });
+        //     bodyList.forEach(element => {
+        //         element.id = uuidv4();
+            // });
         }else{
             throw Error("Empty body");
         }
@@ -63,6 +63,32 @@ router.route('/getCategories').post(myAuth,function(req, res) {
                 returnData(res, item);
             }
         });
+    }catch(ex){
+        returnError(res , ex.message);
+    }
+});
+
+router.route('/getCatSubCatName').post(myAuth,async function(req, res) {
+    try{
+        var catID = req.body.catID;
+        var subCatID = req.body.subCatID;
+        if(!catID || !subCatID)
+        {
+            returnError(res, "plz provide ids");
+            return;
+        }
+        var category = await Category.findOne({id: catID});
+        var subCategory = await SubCategory.find({id: {"$in": subCatID}});
+        if(category && subCategory){
+            var obj = {};
+            obj.category = category;
+            obj.subCategory = subCategory;
+            returnData(res, obj);
+            return;
+        }else{
+            returnError(res, "Category not found");
+            return;
+        }
     }catch(ex){
         returnError(res , ex.message);
     }
@@ -100,9 +126,9 @@ router.route('/addSubCategories').post(myAuth,async function(req, res) {
     try{
         var bodyList = req.body;
         if(bodyList){
-            bodyList.forEach(element => {
-                element.id = uuidv4();
-            });
+            // bodyList.forEach(element => {
+            //     element.id = uuidv4();
+            // });
         }else{
             throw Error("Empty body");
         }
