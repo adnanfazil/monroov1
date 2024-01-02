@@ -56,7 +56,7 @@ router.post('/Register',myAuth, async function (req, res, next) {
         if (!body) return returnError(res, "Info not detected");
 
         const { userName: username, email, phone } = body;
-        let oldUser = await User.findOne({ $or: [{ id: body.id }, { username: username }, { email: email }, { phone: phone }] });
+        let oldUser = await User.findOne({ $or: [{ id: body.id }, { email: email }, { phone: phone }] });
         if (oldUser)
             return returnError(res, "This user already registered, duplicate email or mobile number");
 

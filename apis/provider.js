@@ -18,7 +18,7 @@ router.route('/login').post(myAuth ,function(req, res) {
     let username = req.body.username;
     let fcmToken = req.body.fcmToken;
     if (username){
-        Provider.findOne({username: username} ,function (err, item) {
+        Provider.findOne({$or :[{ username: username },{ email: username }]} ,function (err, item) {
             if (item && item.password) {
                 let password = req.body.password;
                 if (!bcrypt.compareSync(password, item.password)){
@@ -122,8 +122,8 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
     body.id = uuidv4();
     console.log(body);
     if(body){
-        const {username , id , email , phone} = body
-        let oldUser = await Provider.findOne({$or:[{id: id}, {username: username},{email:email},{phone:phone}]});
+        const {id , email , phone} = body
+        let oldUser = await Provider.findOne({$or:[{id: id},{email:email},{phone:phone}]});
         if (oldUser) {
 			return returnError(res , "This user already registered, duplicate email , username , id or mobile number");
         }else{
