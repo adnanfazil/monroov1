@@ -149,6 +149,32 @@ router.post('/ListProviders', auth, async function (req, res) {
     }
 });
 
+router.post('/SearchProviders', auth, async function (req, res) {
+    try{
+        const {key , ids} = req.body;
+        Provider.find( 
+    {$and:
+        [ 
+            {$or: 
+                [
+                    {bio: { "$regex": key, "$options": "i" }}, 
+                    {fname: { "$regex": key, "$options": "i" }},
+                    {experience: { "$regex": key, "$options": "i" }}
+                ]
+            },
+            {catID: {$in: ids} }
+        ]}, function(err, items) {
+            if(err){
+                return returnError(res , err);
+            }else{
+                return returnData(res , items);
+            }
+        } );
+        
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
 
 
 router.post('/RequestEvent', auth, async function (req, res) {
