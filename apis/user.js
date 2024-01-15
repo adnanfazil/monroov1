@@ -153,8 +153,8 @@ router.post('/SearchProviders', auth, async function (req, res) {
     try{
         const key = req.body.key;
         const ids = req.body.ids;
-        Console.log("key" , key);
-        Console.log("ids", ids);
+        console.log("key" , key);
+        console.log("ids", ids);
         Provider.find( 
     {$and:
         [ 
@@ -175,7 +175,7 @@ router.post('/SearchProviders', auth, async function (req, res) {
         } );
         
     }catch(err){
-        return returnError(res, "Data Not Correct");
+        return returnError(res, err);
     }
 });
 
