@@ -162,7 +162,7 @@ router.post('/SearchProviders', auth, async function (req, res) {
                     {experience: { "$regex": key, "$options": "i" }}
                 ]
             },
-            {catID: {$in: ids} }
+            {catID: {$in: JSON(ids)} }
         ]}, function(err, items) {
             if(err){
                 return returnError(res , err);
