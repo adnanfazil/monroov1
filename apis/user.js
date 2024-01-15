@@ -152,7 +152,10 @@ router.post('/ListProviders', auth, async function (req, res) {
 router.post('/SearchProviders', auth, async function (req, res) {
     try{
         const {key , ids} = req.body;
-        Console.log("ids -- "+ ids);
+        Console.log("key");
+        Console.log(key);
+        Console.log("ids");
+        Console.log(ids);
         Provider.find( 
     {$and:
         [ 
