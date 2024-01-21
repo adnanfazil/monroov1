@@ -342,6 +342,8 @@ router.post('/UpdateProvider', [auth ,uploadAll] ,async function( req, res, next
         if (oldUser) {
             body.email = oldUser.email;
             body.id = oldUser.id;
+            body._id = oldUser._id;
+            body._v = oldUser._v;
             let password = body.password;
             if (!bcrypt.compareSync(password, oldUser.password)){
                 return returnError(res , "Wrong password");
