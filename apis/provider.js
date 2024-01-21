@@ -151,13 +151,56 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
 
 router.post('/GetEvents', async function (req, res) {
     try{
-        Event.find({},function(err , items){
-            if(err){
-                return returnError(res, "Failed"+err);
-            }else {
-                return returnData(res, items);
-            }
-        });
+        // Event.find({},function(err , items){
+        //     if(err){
+        //         return returnError(res, "Failed"+err);
+        //     }else {
+        //         return returnData(res, items);
+        //     }
+        // });
+        // Use aggregate to perform a lookup between ModelA and ModelB
+        Event.aggregate([
+        {
+        $lookup: {
+            from: 'User', // collection name for ModelB (case-sensitive)
+            localField: 'userID',
+            foreignField: 'id',
+            as: 'userDetails'
+        }
+        },
+        {
+        $unwind: {
+            path: '$userDetails',
+            preserveNullAndEmptyArrays: true
+        }
+        },
+        {
+        $project: {
+            id: 1,
+            title: 1,
+            desc: 1,
+            createdDate: 1,
+            eventDate: 1,
+            userID: 1,
+            providerID: 1,
+            catID: 1,
+            subCatID: 1,
+            duration: 1,
+            averageCost: 1,
+            country: 1,
+            dealCost: 1,
+            status: 1,
+            userName: '$userDetails.name'
+        }
+        }
+    ]).exec((err, results) => {
+        if (err) {
+            console.error(err);
+            return returnError(res, "Failed"+err);
+        }
+    
+        return returnData(res, results);
+    });
     }catch(err){
         return returnError(res, "Failed"+err);
     }
