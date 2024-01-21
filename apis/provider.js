@@ -262,6 +262,110 @@ router.post('/getAllProvider', function (req, res) {
     });
 });
 
+router.post('/UpdateProvider', [auth ,uploadAll] ,async function( req, res, next) {
+    try {
+    const DOMAIN = process.env.DOMAIN_ME;
+    let body = Provider(JSON.parse(req.body.data));
+    const {images , videos , audios , onevideo , reel , resumeCV , portfolio} = req.files;
+    if(images){
+        let list = [];
+        for(const item of images){
+            list.push(DOMAIN+'uploads/images/'+item.filename);
+        }
+        body.photos = list;
+    }else{
+        body.photos = [];
+    }
+    if(videos){
+        let list = [];
+        for(const item of videos){
+            list.push(DOMAIN+'uploads/videos/'+item.filename);
+        }
+        body.videos = list;
+    }else{
+        body.videos = [];
+    }
+    if(audios){
+        let list = [];
+        for(const item of audios){
+            list.push(DOMAIN+'uploads/audios/'+item.filename);
+        }
+        body.audios = list;
+    }else{
+        body.audios = [];
+    }
+    if(onevideo){
+        let list = [];
+        for(const item of onevideo){
+            list.push(DOMAIN+'uploads/onevideo/'+item.filename);
+        }
+        if(list)
+            body.oneMinuteVideo = list[0]
+    }else{
+        body.oneMinuteVideo = "";
+    }
+    if(reel){
+        let list = [];
+        for(const item of reel){
+            list.push(DOMAIN+'uploads/reel/'+item.filename);
+        }
+        if(list)
+            body.demoReel = list[0]
+    }else{
+        body.demoReel = "";
+    }
+    if(resumeCV){
+        let list = [];
+        for(const item of resumeCV){
+            list.push(DOMAIN+'uploads/resumeCV/'+item.filename);
+        }
+        if(list)
+            body.resume = list[0]
+    }else{
+        body.resume = "";
+    }
+    if(portfolio){
+        let list = [];
+        for(const item of portfolio){
+            list.push(DOMAIN+'uploads/portfolio/'+item.filename);
+        }
+        if(list)
+            body.portfolio = list[0]
+    }else{
+        body.portfolio = "";
+    }
+    body.id = uuidv4();
+    console.log(body);
+    if(body){
+        const {id , email , phone} = body
+        let oldUser = await Provider.findOne({$or:[{id: id},{email:email},{phone:phone}]});
+        if (oldUser) {
+            body.email = oldUser.email;
+            body.id = oldUser.id;
+            let password = body.password;
+            if (!bcrypt.compareSync(password, oldUser.password)){
+                return returnError(res , "Wrong password");
+            }
+            const doc = await Provider.findOneAndUpdate({$or:[{id: id},{email:email}]}, body, {
+                new: true
+              });
+            if(doc){
+                return returnData(res , doc);
+            }else{
+                return returnError(res , "Error occured");
+            }
+        }else{
+            return returnError(res , "User not found");
+        }
+    }else{
+        return returnError(res , "Info not detected");
+    }
+            
+ } catch (error) {
+    return returnError(res , "Error "+error);
+  }
+});
+
 function getToken(id , email , country){
     return jwt.sign(
         { userID: id, email: email, country: country },
