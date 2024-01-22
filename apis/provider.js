@@ -162,9 +162,9 @@ router.post('/GetEvents', async function (req, res) {
         Event.aggregate([
         {
         $lookup: {
-            from: User, // collection name for ModelB (case-sensitive)
-            localField: 'userID',
-            foreignField: 'id',
+            from: 'User', // collection name for ModelB (case-sensitive)
+            localField: 'id',
+            foreignField: 'userID',
             as: 'userDetails'
         }
         },
