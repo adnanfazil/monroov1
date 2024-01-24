@@ -149,7 +149,7 @@ router.post('/Register', uploadAll ,async function( req, res, next) {
   }
 });
 
-router.post('/GetEvents', async function (req, res) {
+router.post('/GetEvents',auth , async function (req, res) {
     try{
         // Event.find({},function(err , items){
         //     if(err){
@@ -158,11 +158,11 @@ router.post('/GetEvents', async function (req, res) {
         //         return returnData(res, items);
         //     }
         // });
-        // Use aggregate to perform a lookup between ModelA and ModelB
+        // Use aggregate to perform a lookup between two models
         Event.aggregate([
         {
         $lookup: {
-            from: 'users', // collection name for ModelB (case-sensitive)
+            from: 'users', // name as mongo named it with s at last
             localField: 'userID',
             foreignField: 'id',
             as: 'userDetails'
@@ -412,6 +412,34 @@ router.post('/UpdateProvider', [auth ,uploadAll] ,async function( req, res, next
  } catch (error) {
     return returnError(res , "Error "+error);
   }
+});
+
+router.post('/RequestConnection', auth, async function (req, res) {
+    try{
+        const eventID = req.body.eventID;
+        const userID = req.body.userID;
+        if(userID && eventID){
+            var message = Message();
+            message.id = crypto.randomUUID();
+            message.msg = "";
+            message.type = 4;
+            message.providerID = req.user.userID;
+            message.eventID = eventID;
+            message.userID = userID;
+            message.senderID = req.user.userID;
+            message.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , true);
+                }
+            });
+        }else{
+            return returnError(res, "Data Not Correct");
+        }
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
 });
 
 function getToken(id , email , country){
