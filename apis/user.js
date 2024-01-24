@@ -245,7 +245,7 @@ router.post('/getDetailedMessages', auth,async function (req, res) {
                 returnError(res , err);
             }else{
                 for (var item of items){
-                    if(item.type === 1){
+                    if(item.type === 1 || item.type === 4){
                         const event = await Event.findOne({id: item.eventID});
                         item.eventObj = event;
                     }
