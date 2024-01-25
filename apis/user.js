@@ -266,7 +266,11 @@ router.post('/getPermission', auth,async function (req, res) {
             if(err){
                return returnError(res , err);
             }else{
-              return returnData(res , item.isAllowed);
+                if(item)
+                    return returnData(res , item.isAllowed);
+                else
+                    return returnData(res , false);
+
             }
         });
     }catch(err){
