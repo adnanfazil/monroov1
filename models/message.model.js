@@ -11,8 +11,9 @@ const schema = new Schema({
    userID: {type: String , default: ""},
    senderID: {type: String , default: ""},
    eventID: {type: String , default: ""},
+   msgDate: {type: String , default: ""},
    eventObj: {type: event, default: null},
-});
+},{strict:false});
 
 
 module.exports = mongoose.model('Message', schema);

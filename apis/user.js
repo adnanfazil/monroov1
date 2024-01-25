@@ -11,7 +11,7 @@ let auth = require("../middleware/auth");
 let myAuth = require("../middleware/myAuth");
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-
+var Permission = require('../models/permission.model');
 
 router.route('/login').post(myAuth,function (req, res) {
     const { username, fcmToken } = req.body;
@@ -257,7 +257,22 @@ router.post('/getDetailedMessages', auth,async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
-
+router.post('/getPermission', auth,async function (req, res) {
+    try{
+        const userID = req.user.userID;
+        const providerID = req.body.providerID;
+        const eventID = req.body.eventID;
+        Permission.findOne({providerID: providerID , userID: userID, eventID: eventID}, function(err , item){
+            if(err){
+                returnError(res , err);
+            }else{
+                returnData(res , item.isAllowed);
+            }
+        });
+    }catch(err){
+        return returnError(res, err);
+    }
+});
 
 router.post('/sendMessage', auth, async function (req, res) {
     try{
@@ -266,6 +281,7 @@ router.post('/sendMessage', auth, async function (req, res) {
             message.id = crypto.randomUUID();
             message.userID = req.user.userID;
             message.senderID = req.user.userID;
+            message.msgDate = Date.now();
             message.save(function(err){
                 if(err){
                     return returnError(res, "Failed" + err);

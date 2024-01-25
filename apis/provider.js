@@ -264,6 +264,7 @@ router.post('/sendMessage', auth, async function (req, res) {
             message.id = crypto.randomUUID();
             message.providerID = req.user.userID;
             message.senderID = req.user.userID;
+            message.msgDate = Date.now();
             message.save(function(err){
                 if(err){
                     return returnError(res, "Failed" + err);
