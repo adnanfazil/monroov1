@@ -264,9 +264,9 @@ router.post('/getPermission', auth,async function (req, res) {
         const eventID = req.body.eventID;
         Permission.findOne({providerID: providerID , userID: userID, eventID: eventID}, function(err , item){
             if(err){
-                returnError(res , err);
+               return returnError(res , err);
             }else{
-                returnData(res , item.isAllowed);
+              return returnData(res , item.isAllowed);
             }
         });
     }catch(err){
