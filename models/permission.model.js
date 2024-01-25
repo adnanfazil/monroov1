@@ -8,7 +8,7 @@ const schema = new Schema({
    providerID: {type: String , default: ""},
    eventID: {type: String , default: ""},
    isAllowed: {type: Boolean , default: false}
-},{strict:false});
+});
 
 
 module.exports = mongoose.model('Permission', schema);
