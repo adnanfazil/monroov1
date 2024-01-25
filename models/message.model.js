@@ -13,7 +13,7 @@ const schema = new Schema({
    eventID: {type: String , default: ""},
    msgDate: {type: String , default: ""},
    eventObj: {type: event, default: null},
-},{strict:false});
+});
 
 
 module.exports = mongoose.model('Message', schema);
