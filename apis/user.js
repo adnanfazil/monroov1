@@ -278,6 +278,33 @@ router.post('/getPermission', auth,async function (req, res) {
     }
 });
 
+router.post('/ApprovePermission', auth,async function (req, res) {
+    try{
+        const userID = req.user.userID;
+        const providerID = req.body.providerID;
+        const eventID = req.body.eventID;
+        if(userID && providerID && eventID){
+            var permission = new Permission();
+            permission.eventID = eventID;
+            permission.providerID = providerID;
+            permission.userID = userID;
+            permission.isAllowed = true;
+            permission.id = crypto.randomUUID();
+            permission.save(function(err){
+                if(err){
+                   return returnError(res , err);
+                }else{
+                    return returnData(res , true);
+                }
+            });
+        }else{
+            return returnError(res, "wrong sent data");
+        }
+
+    }catch(err){
+        return returnError(res, err);
+    }
+});
 router.post('/sendMessage', auth, async function (req, res) {
     try{
         const message = Message(req.body); 
