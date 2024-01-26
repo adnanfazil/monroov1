@@ -215,7 +215,7 @@ router.post('/GetOneEvent',auth , async function (req, res) {
                 return returnError(res, "Failed"+err);
             }else {
                 if(item){
-                    var user = await User.findOne({id: userID});
+                    var user = await User.findOne({id: userID}).lean();
                     item.userName = user.name;
                     return returnData(res, item);
                 }
