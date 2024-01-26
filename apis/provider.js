@@ -216,12 +216,11 @@ router.post('/GetOneEvent',auth , async function (req, res) {
             }else {
                 if(item){
                     var user = await User.findOne({id: userID});
-                    item.lean();
                     item.userName = user.name;
                     return returnData(res, item);
                 }
             }
-        });
+        }).lean();
     }catch(err){
         return returnError(res, "Failed"+err);
     }
