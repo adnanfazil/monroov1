@@ -206,6 +206,25 @@ router.post('/GetEvents',auth , async function (req, res) {
     }
 });
 
+router.post('/GetOneEvent',auth , async function (req, res) {
+    try{
+        var eventID = req.body.eventID;
+        var userID = req.body.userID;
+        Event.findOne({id: eventID}, async function(err , item){
+            if(err){
+                return returnError(res, "Failed"+err);
+            }else {
+                if(item){
+                    var user = await User.findOne({id: userID});
+                    item.userName = user.name;
+                    return returnData(res, item);
+                }
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
+});
 router.post('/getMessagesProfiles', auth, function (req, res) {
     try{
         const userID = req.user.userID;
