@@ -259,7 +259,7 @@ router.post('/getDetailedMessages', auth,async function (req, res) {
 });
 router.post('/getPermission', auth,async function (req, res) {
     try{
-        const userID = req.user.userID;
+        const userID = req.body.userID;
         const providerID = req.body.providerID;
         const eventID = req.body.eventID;
         Permission.findOne({providerID: providerID , userID: userID, eventID: eventID}, function(err , item){
@@ -280,7 +280,7 @@ router.post('/getPermission', auth,async function (req, res) {
 
 router.post('/ApprovePermission', auth,async function (req, res) {
     try{
-        const userID = req.user.userID;
+        const userID = req.body.userID;
         const providerID = req.body.providerID;
         const eventID = req.body.eventID;
         if(userID && providerID && eventID){
