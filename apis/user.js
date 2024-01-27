@@ -178,7 +178,22 @@ router.post('/SearchProviders', auth, async function (req, res) {
         return returnError(res, err);
     }
 });
-
+router.post('/GetProviderProfile',auth , async function (req, res) {
+    try{
+        var providerID = req.body.providerID;
+        Provider.findOne({id: providerID}, async function(err , item){
+            if(err){
+                return returnError(res, "Failed "+err);
+            }else {
+                if(item){
+                    return returnData(res, item);
+                }
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed "+err);
+    }
+});
 
 router.post('/RequestEvent', auth, async function (req, res) {
     try{
