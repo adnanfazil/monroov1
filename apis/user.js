@@ -4,6 +4,7 @@ var User = require('../models/users.model');
 var Provider = require('../models/provider.model');
 var Event = require('../models/event.model');
 var Message = require('../models/message.model');
+var Reviews = require('../models/reviews.model');
 let upload = require("../middleware/multerUpload");
 let uploadOne = require("../middleware/multerUploadSingle");
 let jwt = require('jsonwebtoken');
@@ -117,6 +118,41 @@ router.post('/GetUserEvents',auth, function (req, res) {
     }
 });
 
+
+router.post('/GetReviews',auth, function (req, res) {
+    try{
+        const userID = req.user.userID;
+        const providerID = req.body.providerID;
+        Reviews.find({userID: userID, providerID: providerID},function(err , items){
+            if(err){
+                return returnError(res, "Failed"+err);
+            }else {
+                return returnData(res, items);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
+});
+
+router.post('/AddReview',auth, function (req, res) {
+    try{
+        const review  = new Reviews(req.body);
+        const userID = req.user.userID;
+        review.userID = userID;
+        review.isProvider = false;
+        review.id = crypto.randomUUID();
+        review.save(function(err){
+            if(err){
+                return returnError(res, "Failed" + err);
+            }else{
+                return returnData(res , true);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
+});
 
 router.post('/ListProviders', auth, async function (req, res) {
     try{

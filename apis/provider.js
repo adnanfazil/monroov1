@@ -10,6 +10,8 @@ let myAuth = require("../middleware/myAuth");
 var Message = require('../models/message.model');
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+var Reviews = require('../models/reviews.model');
+
 function uuidv4() {
     return crypto.randomUUID();
 }
@@ -315,7 +317,40 @@ router.post('/getBookings', auth,async function (req, res) {
     }
 });
 
+router.post('/GetReviews',auth, function (req, res) {
+    try{
+        const providerID = req.user.userID;
+        const userID = req.body.userID;
+        Reviews.find({userID: userID, providerID: providerID},function(err , items){
+            if(err){
+                return returnError(res, "Failed"+err);
+            }else {
+                return returnData(res, items);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
+});
 
+router.post('/AddReview',auth, function (req, res) {
+    try{
+        const review  = new Reviews(req.body);
+        const providerID = req.user.userID;
+        review.providerID = providerID;
+        review.isProvider = true;
+        review.id = crypto.randomUUID();
+        review.save(function(err){
+            if(err){
+                return returnError(res, "Failed" + err);
+            }else{
+                return returnData(res , true);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
+});
 
 
 
