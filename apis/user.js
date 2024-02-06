@@ -118,7 +118,6 @@ router.post('/GetUserEvents',auth, function (req, res) {
     }
 });
 
-
 router.post('/GetReviews',auth, function (req, res) {
     try{
         const userID = req.user.userID;
