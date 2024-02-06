@@ -155,7 +155,8 @@ router.post('/AddReview',auth, function (req, res) {
 
 router.post('/ListProviders', auth, async function (req, res) {
     try{
-        const isAll = req.body.isAll;
+        // const isAll = req.body.isAll;
+        const isAll = true;
         const userID = req.user.userID;
         const user = await User.findOne({id: userID});
         if(!user){
