@@ -333,12 +333,16 @@ router.post('/GetReviews',auth, function (req, res) {
     }
 });
 
-router.post('/AddReview',auth, function (req, res) {
+router.post('/AddReview',auth, async function (req, res) {
     try{
         const review  = new Reviews(req.body);
         const providerID = req.user.userID;
         review.providerID = providerID;
         review.isProvider = true;
+        var oldReview = await Reviews.findOne({userID: review.userID, providerID: providerID , isProvider: true });
+        if(oldReview){
+            return returnError(res, "Aready Rated!");
+        }
         review.id = crypto.randomUUID();
         review.save(function(err){
             if(err){
