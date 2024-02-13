@@ -332,6 +332,20 @@ router.post('/GetReviews',auth, function (req, res) {
         return returnError(res, "Failed"+err);
     }
 });
+router.post('/GetMyReviews',auth, function (req, res) {
+    try{
+        const providerID = req.user.userID;
+        Reviews.find({providerID: providerID , isProvider: false},function(err , items){
+            if(err){
+                return returnError(res, "Failed"+err);
+            }else {
+                return returnData(res, items);
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
+});
 
 router.post('/AddReview',auth, async function (req, res) {
     try{
