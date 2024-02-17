@@ -48,6 +48,48 @@ router.route('/login').post(myAuth ,function(req, res) {
         return returnError(res , "Username not detected" );
     }
 });
+router.post('/EasyRegister', uploadAll ,async function( req, res, next) {
+    try {
+    const DOMAIN = process.env.DOMAIN_ME;
+    let body = Provider(JSON.parse(req.body.data));
+    const {profilePic} = req.files;
+    if(profilePic){
+        for(const item of profilePic){
+            body.profilePic = DOMAIN+'uploads/images/'+item.filename;
+        }
+    }else{
+        body.profilePic = "";
+    }
+  
+    body.id = uuidv4();
+    console.log(body);
+    if(body){
+        const {id , email , phone} = body
+        let oldUser = await Provider.findOne({$or:[{id: id},{email:email},{phone:phone}]});
+        if (oldUser) {
+			return returnError(res , "This user already registered, duplicate email , username , id or mobile number");
+        }else{
+            let encryptedPassword = await bcrypt.hash(body.password, 10);
+            body.password = encryptedPassword;
+            let token = getToken(body.id , body.email , body.countryOfResidence);
+            body.token = token;
+            body.save(function (err) {
+                if (err) {
+                    return returnError(res , "Cannot Register "+ err);
+                 }else{
+                    body.password = "*******"
+                    return returnData(res , body);
+		        }
+               });
+        }
+    }else{
+        return returnError(res , "Info not detected");
+    }
+            
+ } catch (error) {
+    return returnError(res , "Error "+error);
+  }
+});
 
 router.post('/Register', uploadAll ,async function( req, res, next) {
     try {
