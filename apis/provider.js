@@ -55,7 +55,7 @@ router.post('/EasyRegister', uploadAll ,async function( req, res, next) {
     const {profilePic} = req.files;
     if(profilePic){
         for(const item of profilePic){
-            body.profilePic = DOMAIN+'uploads/images/'+item.filename;
+            body.profilePic = DOMAIN+'uploads/profilePic/'+item.filename;
         }
     }else{
         body.profilePic = "";
