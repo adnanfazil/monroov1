@@ -38,6 +38,9 @@ let uploadImageMuluter = multer({
             name: 'reel', maxCount: 1
         },
         {
+            name: 'profilePic', maxCount: 1
+        },
+        {
             name: 'resumeCV', maxCount: 1
         },
         {
