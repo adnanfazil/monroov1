@@ -341,7 +341,7 @@ router.post('/RequestEvent', auth, async function (req, res) {
 router.post('/getMessagesProfiles', auth, function (req, res) {
     try{
         const userID = req.user.userID;
-        Message.find({userId: userID}, async function(err , items){
+        Message.find({userID: userID}, async function(err , items){
             if(err){
                 returnError(res , err);
             }else{
@@ -358,7 +358,7 @@ router.post('/getMessagesProfiles', auth, function (req, res) {
                     data.senderName = sender.fname;
                     data.senderPhoto = sender.profilePic;
                     response.push(data);
-                }5
+                }
                 returnData(res , response);
             }
         });
