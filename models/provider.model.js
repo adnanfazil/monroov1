@@ -9,7 +9,7 @@ var subCategories = require('../models/subcategory.model').schema;
 const schema = new Schema({
    id: {type: String , unique: true},
    catID: {type: String , default: ""},
-   subCatID: {type: [subCategories] , default: []},
+   subCatID: {type: [Object] , default: []},
    profilePic: {type: String , default: ""},
    fname: {type: String , default: ""},
    lname: {type: String , default: ""},
