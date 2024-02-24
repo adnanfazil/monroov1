@@ -16,7 +16,7 @@ let uploadAll = require("../middleware/uploadAll");
 router.route('/loginSocial').post(myAuth ,function(req, res) {
     const { username, fcmToken } = req.body;
     if (username){
-        Provider.findOne({$or :[{ username: username },{ email: username }]} ,function (err, item) {
+        User.findOne({$or :[{ username: username },{ email: username }]} ,function (err, item) {
             if (item && item.password) {
                 let password = process.env.SOCIALPASS;
                 if (!bcrypt.compareSync(password, item.password)){
