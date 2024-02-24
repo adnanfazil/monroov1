@@ -95,7 +95,8 @@ router.post('/SocialRegister',[uploadAll , myAuth], async function (req, res, ne
         let oldUser = await User.findOne({ $or: [{ id: body.id }, { email: email }, { phone: phone }] });
         if (oldUser)
             return returnError(res, "This user already registered, duplicate email or mobile number");
-
+            
+        body.password = process.env.SOCIALPASS;
         let encryptedPassword = await bcrypt.hash(body.password, 10);
         body.password = encryptedPassword;
         let token = getToken(userID , body.email , body.country);

@@ -79,7 +79,7 @@ router.route('/login').post(myAuth ,function(req, res) {
         return returnError(res , "Username not detected" );
     }
 });
-router.post('/SocialRegister', uploadAll ,async function( req, res, next) {
+router.post('/SocialRegister', [uploadAll , myAuth] ,async function( req, res, next) {
     try {
     const DOMAIN = process.env.DOMAIN_ME;
     let body = Provider(JSON.parse(req.body.data));
@@ -119,7 +119,7 @@ router.post('/SocialRegister', uploadAll ,async function( req, res, next) {
     return returnError(res , "Error "+error);
   }
 });
-router.post('/EasyRegister', uploadAll ,async function( req, res, next) {
+router.post('/EasyRegister', [uploadAll , myAuth] ,async function( req, res, next) {
     try {
     const DOMAIN = process.env.DOMAIN_ME;
     let body = Provider(JSON.parse(req.body.data));
