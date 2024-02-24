@@ -80,7 +80,6 @@ router.post('/SocialRegister',[uploadAll , myAuth], async function (req, res, ne
     try {
         const DOMAIN = process.env.DOMAIN_ME;
         const body = User(JSON.parse(req.body.data));
-        console.log({body});
         const {profilePic} = req.files;
         if(profilePic){
             for(const item of profilePic){
@@ -101,6 +100,7 @@ router.post('/SocialRegister',[uploadAll , myAuth], async function (req, res, ne
         body.password = encryptedPassword;
         let token = getToken(userID , body.email , body.country);
         body.token = token;
+        console.log({body});
         body.save(function (err) {
             if (err) {
                 return returnError(res, "Cannot Register " + err);
