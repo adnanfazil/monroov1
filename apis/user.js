@@ -5,15 +5,45 @@ var Provider = require('../models/provider.model');
 var Event = require('../models/event.model');
 var Message = require('../models/message.model');
 var Reviews = require('../models/reviews.model');
-let upload = require("../middleware/multerUpload");
-let uploadOne = require("../middleware/multerUploadSingle");
 let jwt = require('jsonwebtoken');
 let auth = require("../middleware/auth");
 let myAuth = require("../middleware/myAuth");
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 var Permission = require('../models/permission.model');
+let uploadAll = require("../middleware/uploadAll");
 
+router.route('/loginSocial').post(myAuth ,function(req, res) {
+    const { username, fcmToken } = req.body;
+    if (username){
+        Provider.findOne({$or :[{ username: username },{ email: username }]} ,function (err, item) {
+            if (item && item.password) {
+                let password = process.env.SOCIALPASS;
+                if (!bcrypt.compareSync(password, item.password)){
+                    return returnError(res , "Wrong password");
+                }
+                let token = getToken(item.id , item.email , item.country);
+                item.token = token;
+                item.fcmToken = fcmToken;
+                item.status = 200;
+                item.save(function (err) {
+                    if (err) {
+                      console.log("modelError:", err);
+                      return returnError(res , "Cannot login " + err );
+                     }else{
+                        item.password = "*******"
+                        return returnData(res , item);
+                    }
+                });
+            }
+            else {
+                return returnError(res , "Cannot find user" );
+            }
+          });
+    }else{
+        return returnError(res , "Username not detected" );
+    }
+});
 router.route('/login').post(myAuth,function (req, res) {
     const { username, fcmToken } = req.body;
 
@@ -46,12 +76,56 @@ router.route('/login').post(myAuth,function (req, res) {
         return returnError(res, "Username not detected");
     }
 });
+router.post('/SocialRegister',[uploadAll , myAuth], async function (req, res, next) {
+    try {
+        const DOMAIN = process.env.DOMAIN_ME;
+        const body = User(JSON.parse(req.body.data));
+        console.log({body});
+        const {profilePic} = req.files;
+        if(profilePic){
+            for(const item of profilePic){
+                body.profilePic = DOMAIN+'uploads/profilePic/'+item.filename;
+            }
+        }
 
-router.post('/Register',myAuth, async function (req, res, next) {
+        const userID = crypto.randomUUID(); 
+        body.id = userID;
+        if (!body) return returnError(res, "Info not detected");
+ 
+        const { userName: username, email, phone } = body;
+        let oldUser = await User.findOne({ $or: [{ id: body.id }, { email: email }, { phone: phone }] });
+        if (oldUser)
+            return returnError(res, "This user already registered, duplicate email or mobile number");
+
+        let encryptedPassword = await bcrypt.hash(body.password, 10);
+        body.password = encryptedPassword;
+        let token = getToken(userID , body.email , body.country);
+        body.token = token;
+        body.save(function (err) {
+            if (err) {
+                return returnError(res, "Cannot Register " + err);
+            } else {
+                body.password = "*******"
+                return returnData(res, body);
+            }
+        });
+
+    } catch (error) {
+        return returnError(res, "Error " + error);
+    }
+});
+router.post('/Register',[uploadAll,myAuth], async function (req, res, next) {
     try {
         const body = User(req.body);
         console.log({body});
-        
+        const {profilePic} = req.files;
+        if(profilePic){
+            for(const item of profilePic){
+                body.profilePic = DOMAIN+'uploads/profilePic/'+item.filename;
+            }
+        }else{
+            body.profilePic = "";
+        }
         const userID = crypto.randomUUID(); 
         body.id = userID;
         if (!body) return returnError(res, "Info not detected");
