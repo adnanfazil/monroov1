@@ -32,9 +32,9 @@ var apiProvider = require('./apis/provider');
 app.use('/monroo/apis/provider', apiProvider);
 
 
-app.use('/', (req, res) => {
-  return res.redirect('monroo');
-})
+// app.use('/', (req, res) => {
+//   return res.redirect('monroo');
+// })
 
 app.use('/*', (req, res) => {
     res.status(404).send({
