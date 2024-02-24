@@ -197,7 +197,7 @@ router.post('/GetReviews',auth, function (req, res) {
     try{
         const userID = req.user.userID;
         const providerID = req.body.providerID;
-        Reviews.find({userID: userID, providerID: providerID},function(err , items){
+        Reviews.find({providerID: providerID},function(err , items){
             if(err){
                 return returnError(res, "Failed"+err);
             }else {
