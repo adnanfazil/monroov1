@@ -25,8 +25,8 @@ router.route('/checkAuth').post(async function(req, res) {
             req.user = decoded;
             req.user.userID
             var user = await User.findOne({id: userID});
-            return res.status(200).send(user);
-          } catch (err) {
+            return returnData(res , user);
+        } catch (err) {
             try{
                 if(err.name === 'TokenExpiredError') {
                     const payload = jwt.verify(tokenMe, config.JWT_KEY, {ignoreExpiration: true} );
@@ -42,15 +42,15 @@ router.route('/checkAuth').post(async function(req, res) {
                         }
                        );
                        user.token = token;
-                       return res.status(200).send(user);
+                       return returnData(res , user);
     
                 }else{
                     console.log("err not expired but other exception :" + err);
-                    return res.status(400).send({status: 401, error: "Token is not valid ."});
+                    return returnError(res , "Token is not valid .");
                 }
             }catch(err){
                 console.log(err);
-                return res.status(401).send({status: 401, error: "Token is not valid "+ err.message});
+                return returnError(res , "Token is not valid "+ err.message);
 
             }
 
