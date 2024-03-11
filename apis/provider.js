@@ -15,6 +15,47 @@ var Reviews = require('../models/reviews.model');
 function uuidv4() {
     return crypto.randomUUID();
 }
+router.route('/checkAuth').post(async function(req, res) {
+    const config = process.env;
+    var tokenMe = req.headers["x-access-token"];
+    if (!tokenMe) {
+        res.status(202).send({status: 403, error: "Token is not sent"});
+    }else{
+        try {
+            const decoded = jwt.verify(tokenMe, config.JWT_KEY);
+            req.user = decoded;
+            req.user.userID
+            var user = await Provider.findOne({id: userID});
+            return res.status(200).send(user);
+          } catch (err) {
+            try{
+                if(err.name === 'TokenExpiredError') {
+                    const payload = jwt.verify(tokenMe, config.JWT_KEY, {ignoreExpiration: true} );
+                    var userID = payload.userID;
+                    var user = await Provider.findOne({id: userID});
+                    var email = user.email;
+                    let token = jwt.sign(
+                        { userID: id, email: email, country: country },
+                            process.env.JWT_KEY,
+                        {
+                           expiresIn: "24h",
+                        }
+                       );
+                       user.token = token;
+                       return res.status(200).send(user);
+    
+                }else{
+                    return res.status(401).send({status: 401, error: "Token is not valid ."});
+                }
+            }catch(err){
+                return res.status(401).send({status: 401, error: "Token is not valid "+ err.message});
+
+            }
+
+          }
+    }
+
+});
 router.route('/loginSocial').post(myAuth ,function(req, res) {
     let username = req.body.username;
     let fcmToken = req.body.fcmToken;
