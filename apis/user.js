@@ -33,8 +33,9 @@ router.route('/checkAuth').post(async function(req, res) {
                     var userID = payload.userID;
                     var user = await User.findOne({id: userID});
                     var email = user.email;
+                    var country = user.country;
                     let token = jwt.sign(
-                        { userID: id, email: email, country: country },
+                        { userID: userID, email: email, country: country },
                             process.env.JWT_KEY,
                         {
                            expiresIn: "24h",
