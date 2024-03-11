@@ -18,13 +18,16 @@ router.route('/checkAuth').post(async function(req, res) {
     const config = process.env;
     var tokenMe = req.headers["x-access-token"];
     if (!tokenMe) {
-        res.status(202).send({status: 403, error: "Token is not sent"});
+        return returnError(res , "Token not sent");
     }else{
         try {
             const decoded = jwt.verify(tokenMe, config.JWT_KEY);
             req.user = decoded;
             let userID = req.user.userID
             var user = await User.findOne({id: userID});
+            if(!user){
+                return returnError(res , "User Not Found");
+            }
             return returnData(res , user);
         } catch (err) {
             try{
@@ -46,7 +49,7 @@ router.route('/checkAuth').post(async function(req, res) {
     
                 }else{
                     console.log("err not expired but other exception :" + err);
-                    return returnError(res , "Token is not valid .");
+                    return returnError(res , "Token is not valid ." + err);
                 }
             }catch(err){
                 console.log(err);
