@@ -44,9 +44,11 @@ router.route('/checkAuth').post(async function(req, res) {
                        return res.status(200).send(user);
     
                 }else{
+                    console.log("err not expired but other exception :" + err);
                     return res.status(401).send({status: 401, error: "Token is not valid ."});
                 }
             }catch(err){
+                console.log(err);
                 return res.status(401).send({status: 401, error: "Token is not valid "+ err.message});
 
             }
