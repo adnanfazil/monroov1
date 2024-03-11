@@ -24,7 +24,7 @@ router.route('/checkAuth').post(async function(req, res) {
             const decoded = jwt.verify(tokenMe, config.JWT_KEY);
             req.user = decoded;
             req.user.userID
-            var user = await User.findOne({id: userID});
+            var user = await User.findOne({id: req.user.userID});
             return returnData(res , user);
         } catch (err) {
             try{
