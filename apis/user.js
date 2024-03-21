@@ -165,6 +165,7 @@ router.post('/SocialRegister',[uploadAll , myAuth], async function (req, res, ne
 });
 router.post('/Register',[uploadAll,myAuth], async function (req, res, next) {
     try {
+        const DOMAIN = process.env.DOMAIN_ME;
         const body = User(req.body);
         console.log({body});
         const {profilePic} = req.files;
