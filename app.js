@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+const cors = require('cors'); 
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -8,6 +9,11 @@ require("dotenv").config();
 
 
 var app = express();
+// const corsOptions = {
+//   credentials: true,
+//   origin: ['http://localhost:3000', '*'] // Change * to react domain hosting in future
+// };
+app.use(cors());  // Use the cors middleware with your options
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
