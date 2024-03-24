@@ -416,7 +416,7 @@ router.post('/MakeADeal', auth, async function (req, res) {
     }
 });
 
-router.post('/ApproveDeal', auth,async function (req, res) {
+router.post('/ApproveDeal', auth, function (req, res) {
     try{
         const userID = req.body.userID;
         const providerID = req.body.providerID;
@@ -424,31 +424,33 @@ router.post('/ApproveDeal', auth,async function (req, res) {
         const msgID = req.body.msgID;
         if(userID && providerID && eventID , msgID){
             var messageOld = Message.findOne({id : msgID });
-            var event = Event.findOne({id : eventID });
-            if(event && messageOld){
-                console.log("oldmsg" , messageOld.msg);
-                event.dealCost = messageOld.msg;
-                event.providerID = providerID;
-                event.status = 1; // booked
-                await event.save();
-                var message = Message();
-                message.id = crypto.randomUUID();
-                message.msg = messageOld.msg;
-                message.type = 6;
-                message.providerID = providerID;
-                message.eventID = eventID;
-                message.userID = userID;
-                message.senderID = providerID;
-                message.save(function(err){
-                    if(err){
-                        return returnError(res, "Failed" + err);
-                    }else{
-                        return returnData(res , true);
-                    }
-                });
-            }else{
-                return returnError(res, "Failed, Event not found");
-            }
+             Event.findOne({id : eventID } , async function(err , event){
+                if(event && messageOld){
+                    console.log("oldmsg" , messageOld.msg);
+                    event.dealCost = messageOld.msg;
+                    event.providerID = providerID;
+                    event.status = 1; // booked
+                    await event.save();
+                    var message = Message();
+                    message.id = crypto.randomUUID();
+                    message.msg = messageOld.msg;
+                    message.type = 6;
+                    message.providerID = providerID;
+                    message.eventID = eventID;
+                    message.userID = userID;
+                    message.senderID = providerID;
+                    message.save(function(err){
+                        if(err){
+                            return returnError(res, "Failed" + err);
+                        }else{
+                            return returnData(res , true);
+                        }
+                    });
+                }else{
+                    return returnError(res, "Failed, Event not found");
+                }
+             });
+  
  
         }else{
             return returnError(res, "wrong sent data");
