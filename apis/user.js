@@ -423,8 +423,8 @@ router.post('/ApproveDeal', auth, function (req, res) {
         const eventID = req.body.eventID;
         const msgID = req.body.msgID;
         if(userID && providerID && eventID , msgID){
-            var messageOld = Message.findOne({id : msgID });
              Event.findOne({id : eventID } , async function(err , event){
+                var messageOld = await Message.findOne({id : msgID });
                 if(event && messageOld){
                     console.log("oldmsg" , messageOld.msg);
                     event.dealCost = messageOld.msg;
