@@ -387,6 +387,66 @@ router.post('/RequestEvent', auth, async function (req, res) {
     }
 });
 
+router.post('/MakeADeal', auth, async function (req, res) {
+    try{
+        const eventID = req.body.eventID;
+        const providerID = req.body.providerID;
+        const dealPrice = req.body.dealPrice;
+        if(providerID && eventID){
+            var message = Message();
+            message.id = crypto.randomUUID();
+            message.msg = dealPrice;
+            message.type = 5;
+            message.providerID = providerID;
+            message.eventID = eventID;
+            message.userID = req.user.userID;
+            message.senderID = req.user.userID;
+            message.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , true);
+                }
+            });
+        }else{
+            return returnError(res, "Data Not Correct");
+        }
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
+
+router.post('/ApproveDeal', auth,async function (req, res) {
+    try{
+        const userID = req.body.userID;
+        const providerID = req.body.providerID;
+        const eventID = req.body.eventID;
+        const msgID = req.body.msgID;
+        if(userID && providerID && eventID , msgID){
+            var messageOld = Message.findOne({id : msgID });
+            var message = Message();
+            message.id = crypto.randomUUID();
+            message.msg = messageOld.msg;
+            message.type = 6;
+            message.providerID = providerID;
+            message.eventID = eventID;
+            message.userID = userID;
+            message.senderID = providerID;
+            message.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , true);
+                }
+            });
+        }else{
+            return returnError(res, "wrong sent data");
+        }
+
+    }catch(err){
+        return returnError(res, err);
+    }
+});
 router.post('/getMessagesProfiles', auth, function (req, res) {
     try{
         const userID = req.user.userID;
@@ -424,7 +484,7 @@ router.post('/getDetailedMessages', auth,async function (req, res) {
                 returnError(res , err);
             }else{
                 for (var item of items){
-                    if(item.type === 1 || item.type === 4){
+                    if(item.type === 1 || item.type === 4 || item.type === 5){
                         const event = await Event.findOne({id: item.eventID});
                         item.eventObj = event;
                     }
@@ -456,6 +516,7 @@ router.post('/getPermission', auth,async function (req, res) {
         return returnError(res, err);
     }
 });
+
 
 router.post('/ApprovePermission', auth,async function (req, res) {
     try{
