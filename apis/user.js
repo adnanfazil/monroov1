@@ -424,21 +424,31 @@ router.post('/ApproveDeal', auth,async function (req, res) {
         const msgID = req.body.msgID;
         if(userID && providerID && eventID , msgID){
             var messageOld = Message.findOne({id : msgID });
-            var message = Message();
-            message.id = crypto.randomUUID();
-            message.msg = messageOld.msg;
-            message.type = 6;
-            message.providerID = providerID;
-            message.eventID = eventID;
-            message.userID = userID;
-            message.senderID = providerID;
-            message.save(function(err){
-                if(err){
-                    return returnError(res, "Failed" + err);
-                }else{
-                    return returnData(res , true);
-                }
-            });
+            var event = Event.findOne({id : eventID });
+            if(event){
+                event.dealCost = messageOld.msg;
+                event.providerID = providerID;
+                event.status = 1; // booked
+                await event.save();
+                var message = Message();
+                message.id = crypto.randomUUID();
+                message.msg = messageOld.msg;
+                message.type = 6;
+                message.providerID = providerID;
+                message.eventID = eventID;
+                message.userID = userID;
+                message.senderID = providerID;
+                message.save(function(err){
+                    if(err){
+                        return returnError(res, "Failed" + err);
+                    }else{
+                        return returnData(res , true);
+                    }
+                });
+            }else{
+                return returnError(res, "Failed, Event not found");
+            }
+ 
         }else{
             return returnError(res, "wrong sent data");
         }
