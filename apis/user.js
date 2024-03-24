@@ -426,6 +426,7 @@ router.post('/ApproveDeal', auth,async function (req, res) {
             var messageOld = Message.findOne({id : msgID });
             var event = Event.findOne({id : eventID });
             if(event){
+                console.log("oldmsg" , messageOld);
                 event.dealCost = messageOld.msg;
                 event.providerID = providerID;
                 event.status = 1; // booked
