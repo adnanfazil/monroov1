@@ -455,7 +455,7 @@ router.post('/ApproveDeal', auth,async function (req, res) {
         }
 
     }catch(err){
-        return returnError(res, err);
+        return returnError(res, err.message);
     }
 });
 router.post('/getMessagesProfiles', auth, function (req, res) {
