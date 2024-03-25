@@ -18,6 +18,7 @@ function uuidv4() {
 router.route('/changeField').post(async function(req, res) {
     Provider.path('subCatID').required(false);
     Provider.path('subCatID').options.type = Object;
+    returnData(res, "Ok");
 });
     router.route('/checkAuth').post(async function(req, res) {
     const config = process.env;
