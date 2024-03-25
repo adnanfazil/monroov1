@@ -15,7 +15,11 @@ var Reviews = require('../models/reviews.model');
 function uuidv4() {
     return crypto.randomUUID();
 }
-router.route('/checkAuth').post(async function(req, res) {
+router.route('/changeField').post(async function(req, res) {
+    Provider.path('subCatID').required(false);
+    Provider.path('subCatID').options.type = Object;
+});
+    router.route('/checkAuth').post(async function(req, res) {
     const config = process.env;
     var tokenMe = req.headers["x-access-token"];
     if (!tokenMe) {
