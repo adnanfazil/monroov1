@@ -213,7 +213,7 @@ router.route('/addEducations').post(myAuth,async function(req, res) {
 });
 
 
-router.route('/getEducations').post(myAuth,function(req, res) {
+router.route('/getEducations').post(function(req, res) {
     try{
         Education.find(function (err, item) {
             if(err){
