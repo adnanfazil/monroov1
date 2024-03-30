@@ -36,7 +36,7 @@ router.route('/addCategory').post(myAuth, async function(req, res) {
 });
 
 
-router.route('/addCategories').post(myAuth,async function(req, res) {
+router.route('/addCategories').post(async function(req, res) {
     try{
         var bodyList = req.body;
         if(bodyList){
