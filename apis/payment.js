@@ -11,7 +11,6 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const User = require('../models/users.model');
 const Provider = require('../models/provider.model');
-import got from 'got';
 //https://developer.paypal.com/braintree/docs/start/hello-server/node
 const gateway = new braintree.BraintreeGateway({
     environment: braintree.Environment.Sandbox,
