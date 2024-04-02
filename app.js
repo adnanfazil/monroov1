@@ -30,6 +30,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 var lookups = require('./apis/lookups');
 app.use('/monroo/apis/lookups', lookups);
 
+var payment = require('./apis/payment');
+app.use('/monroo/apis/payment', payment);
+
 var apiUser = require('./apis/user');
 app.use('/monroo/apis/user', apiUser);
 

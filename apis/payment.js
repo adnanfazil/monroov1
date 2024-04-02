@@ -1,0 +1,55 @@
+const express = require('express');
+var router = express.Router();
+const myAuth = require("../middleware/myAuth");
+let auth = require("../middleware/auth");
+const config = process.env;
+
+const braintree = require("braintree");
+
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const User = require('../models/users.model');
+const Provider = require('../models/provider.model');
+import got from 'got';
+//https://developer.paypal.com/braintree/docs/start/hello-server/node
+const gateway = new braintree.BraintreeGateway({
+    environment: braintree.Environment.Sandbox,
+    merchantId: config.MERCHANT_ID,
+    publicKey: config.PAY_PUBLIC,
+    privateKey: config.PAY_SECRET
+  });
+function uuidv4() {
+    return crypto.randomUUID();
+}
+
+router.route('/Authorize').post([myAuth , auth],function (req, res) {
+      gateway.clientToken.generate({}, (err, response) => {
+        res.send(response.clientToken);
+      });
+});
+router.route('/checkout').post([myAuth , auth],async function (req, res) {
+    const nonceFromTheClient = req.body.nonceFromTheClient;
+    gateway.transaction.sale({
+        amount: "10.00",
+        paymentMethodNonce: nonceFromTheClient,
+        deviceData: {device: "android" , id: "XXCXXxx"},
+        options: {
+          submitForSettlement: true
+        }
+      }, (err, result) => {
+        if(err)
+            return returnError(res , err);
+        if(result)
+            return returnData(res , result);
+      });
+});
+
+function returnError(res, error) {
+    return res.status(203).send({ status: 203, data: error });
+}
+
+function returnData(res, data) {
+    return res.status(200).send({ status: 200, data: data });
+}
+module.exports = router;
