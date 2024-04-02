@@ -29,9 +29,11 @@ router.route('/Authorize').post([myAuth , auth],function (req, res) {
 });
 router.route('/checkout').post([myAuth , auth],async function (req, res) {
     const nonceFromTheClient = req.body.nonceFromTheClient;
+    const deviceData = req.body.deviceData;
     gateway.transaction.sale({
         amount: "10.00",
         paymentMethodNonce: nonceFromTheClient,
+        deviceData: deviceData,
         options: {
           submitForSettlement: true
         }
