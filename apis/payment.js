@@ -32,7 +32,6 @@ router.route('/checkout').post([myAuth , auth],async function (req, res) {
     gateway.transaction.sale({
         amount: "10.00",
         paymentMethodNonce: nonceFromTheClient,
-        deviceData: {device: "android" , id: "XXCXXxx"},
         options: {
           submitForSettlement: true
         }
