@@ -529,7 +529,7 @@ router.post('/getPermission', auth,async function (req, res) {
                 if(item)
                     return returnData(res , item);
                 else
-                    return returnData(res , false);
+                    return returnError(res , "Send not allowed");
 
             }
         });
