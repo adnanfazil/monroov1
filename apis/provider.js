@@ -464,7 +464,7 @@ router.post('/getBookings', auth,async function (req, res) {
     try{
         const currentTimestampInMilliseconds = new Date().getTime();
         const providerID = req.user.userID;
-        Event.find({providerID: providerID}, async function(err , items){
+        Event.find({providerID: providerID, status: {$ne: 4} }, async function(err , items){
             if(err){
                 returnError(res , err);
             }else{
