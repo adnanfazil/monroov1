@@ -448,8 +448,10 @@ router.post('/ApproveDeal', auth, function (req, res) {
                                 permission.isWaitingPayment = true;
                                 permission.isAllowed = false;
                                 permission.eventDoneSucces = false;
+                                await permission.save();
                                 return returnData(res , true);
                             }else{
+                                // create new permission and save
                                 return returnError(res, "Failed, Permission error occured");
                             }
                         }
