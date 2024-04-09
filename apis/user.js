@@ -549,7 +549,11 @@ router.post('/ApprovePermission', auth,async function (req, res) {
         const permissionValue = req.body.permissionValue;
         const paymentwaiting = req.body.paymentwaiting;
         if(userID && providerID && eventID){
-            var permission = new Permission();
+            let permission = await Permission.findOne({userID: userID, providerID: providerID, eventID: eventID});
+            if(!permission || !permission.id){
+                permission = new Permission();
+                permission.id = crypto.randomUUID();
+            }
             permission.eventID = eventID;
             permission.providerID = providerID;
             permission.userID = userID;
@@ -561,7 +565,6 @@ router.post('/ApprovePermission', auth,async function (req, res) {
                 permission.isWaitingPayment = false;
             else
                 permission.isWaitingPayment = paymentwaiting;
-            permission.id = crypto.randomUUID();
             permission.save(function(err){
                 if(err){
                    return returnError(res , err);

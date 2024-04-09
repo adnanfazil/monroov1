@@ -52,11 +52,18 @@ router.route('/checkout').post([myAuth , auth],async function (req, res) {
         options: {
           submitForSettlement: true
         }
-      }, (err, result) => {
+      },async (err, result) => {
         if(err)
             return returnError(res , err);
-        if(result)
-            return returnData(res , result);
+        if(result){
+          const eventID = req.body.eventID;
+          let event = await Events.findOne({id: eventID});
+          if(event){
+            event.status = 3;
+            event.save();
+          }
+          return returnData(res , {result: result , event: event});
+        }
       });
 });
 
