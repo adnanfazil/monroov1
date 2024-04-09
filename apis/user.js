@@ -244,7 +244,7 @@ router.post('/GetUserEvents',auth, function (req, res) {
 
 router.post('/cancelEvent',auth, function (req, res) {
     try{
-        const eventID = req.user.eventID;
+        const eventID = req.body.eventID;
         Event.findOne({id: eventID},function(err , item){
             if(err){
                 return returnError(res, "Failed"+err);
