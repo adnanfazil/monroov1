@@ -7,7 +7,9 @@ const schema = new Schema({
    userID: {type: String , default: ""},
    providerID: {type: String , default: ""},
    eventID: {type: String , default: ""},
-   isAllowed: {type: Boolean , default: false}
+   isAllowed: {type: Boolean , default: false},
+   isWaitingPayment: {type: Boolean , default: false},
+   eventDoneSucces: {type: Boolean , default: false}
 });
 
 

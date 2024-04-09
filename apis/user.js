@@ -426,7 +426,7 @@ router.post('/ApproveDeal', auth, function (req, res) {
              Event.findOne({id : eventID } , async function(err , event){
                 var messageOld = await Message.findOne({id : msgID });
                 if(event && messageOld){
-                    console.log("oldmsg" , messageOld.msg);
+                    // console.log("oldmsg" , messageOld.msg);
                     event.dealCost = messageOld.msg;
                     event.providerID = providerID;
                     event.status = 1; // booked
@@ -439,11 +439,19 @@ router.post('/ApproveDeal', auth, function (req, res) {
                     message.eventID = eventID;
                     message.userID = userID;
                     message.senderID = providerID;
-                    message.save(function(err){
+                    message.save(async function(err){
                         if(err){
                             return returnError(res, "Failed" + err);
                         }else{
-                            return returnData(res , true);
+                            let permission = await Permission.findOne({userID: userID , providerID: providerID ,eventID : eventID});
+                            if(permission){
+                                permission.isWaitingPayment = true;
+                                permission.isAllowed = false;
+                                permission.eventDoneSucces = false;
+                                return returnData(res , true);
+                            }else{
+                                return returnError(res, "Failed, Permission error occured");
+                            }
                         }
                     });
                 }else{
@@ -519,7 +527,7 @@ router.post('/getPermission', auth,async function (req, res) {
                return returnError(res , err);
             }else{
                 if(item)
-                    return returnData(res , item.isAllowed);
+                    return returnData(res , item);
                 else
                     return returnData(res , false);
 
@@ -536,18 +544,27 @@ router.post('/ApprovePermission', auth,async function (req, res) {
         const userID = req.body.userID;
         const providerID = req.body.providerID;
         const eventID = req.body.eventID;
+        const permissionValue = req.body.permissionValue;
+        const paymentwaiting = req.body.paymentwaiting;
         if(userID && providerID && eventID){
             var permission = new Permission();
             permission.eventID = eventID;
             permission.providerID = providerID;
             permission.userID = userID;
-            permission.isAllowed = true;
+            if(permissionValue === undefined || permissionValue === null)
+                permission.isAllowed = true;
+            else
+                permission.isAllowed = permissionValue;
+            if(paymentwaiting === undefined || paymentwaiting === null)
+                permission.isWaitingPayment = false;
+            else
+                permission.isWaitingPayment = paymentwaiting;
             permission.id = crypto.randomUUID();
             permission.save(function(err){
                 if(err){
                    return returnError(res , err);
                 }else{
-                    return returnData(res , true);
+                    return returnData(res , permission);
                 }
             });
         }else{

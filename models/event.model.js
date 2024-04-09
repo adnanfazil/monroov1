@@ -20,7 +20,7 @@ const schema = new Schema({
    averageCost: {type: String , default: ""},
    country: {type: String , default: ""},
    dealCost: {type: String , default: ""},
-   status: {type: Number , default: 0} // 0 = Pending, 1 = Booked, 2 = Done, 3 = Purchased, 4 = Canceled
+   status: {type: Number , default: 0} // 0 = Pending, 1 = Booked, 2 = Done, 3 = Purchased, 4 = Canceled // 5 = need purchase
 });
 
 

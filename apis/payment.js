@@ -11,6 +11,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const User = require('../models/users.model');
 const Provider = require('../models/provider.model');
+const Events = require('../models/event.model');
 //https://developer.paypal.com/braintree/docs/start/hello-server/node
 const gateway = new braintree.BraintreeGateway({
     environment: braintree.Environment.Sandbox,
@@ -30,8 +31,22 @@ router.route('/Authorize').post([myAuth , auth],function (req, res) {
 router.route('/checkout').post([myAuth , auth],async function (req, res) {
     const nonceFromTheClient = req.body.nonceFromTheClient;
     const deviceData = req.body.deviceData;
+    let amount = req.body.amount;
+    const eventID = req.body.eventID;
+    if(!amount){
+      let event = await Events.findOne({id: eventID});
+      try{
+        Number.parseFloat(event.dealCost);
+        amount = event.dealCost;
+      }catch(err){
+        amount = '0';
+      }
+    }
+    if(amount === '0'){
+      return returnData(res , "Amount not detected");
+    }
     gateway.transaction.sale({
-        amount: "10.00",
+        amount: amount ,//"10.00",
         paymentMethodNonce: nonceFromTheClient,
         deviceData: deviceData,
         options: {
