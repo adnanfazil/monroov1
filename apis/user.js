@@ -242,6 +242,26 @@ router.post('/GetUserEvents',auth, function (req, res) {
     }
 });
 
+router.post('/cancelEvent',auth, function (req, res) {
+    try{
+        const eventID = req.user.eventID;
+        Event.findOne({id: eventID},function(err , item){
+            if(err){
+                return returnError(res, "Failed"+err);
+            }else {
+                if(item){
+                    item.status = 4;// cancel
+                    return returnData(res, item);
+                }else{
+                    return returnError(res, "Failed, event not found");
+                }
+            }
+        });
+    }catch(err){
+        return returnError(res, "Failed"+err);
+    }
+});
+
 router.post('/GetReviews',auth, function (req, res) {
     try{
         const userID = req.user.userID;
@@ -608,7 +628,7 @@ router.post('/getBookings', auth,async function (req, res) {
     try{
         const currentTimestampInMilliseconds = new Date().getTime();
         const userID = req.user.userID;
-        Event.find({userID: userID}, async function(err , items){
+        Event.find({userID: userID, status: {$ne: 4} }, async function(err , items){
             if(err){
                 returnError(res , err);
             }else{
