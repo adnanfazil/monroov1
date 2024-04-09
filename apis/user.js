@@ -251,6 +251,7 @@ router.post('/cancelEvent',auth, function (req, res) {
             }else {
                 if(item){
                     item.status = 4;// cancel
+                    item.save();
                     return returnData(res, item);
                 }else{
                     return returnError(res, "Failed, event not found");
