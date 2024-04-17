@@ -14,6 +14,16 @@ var Permission = require('../models/permission.model');
 let uploadAll = require("../middleware/uploadAll");
 
 
+router.route('/removeUser').post(myAuth,async function(req, res) {
+    User.deleteMany({id: req.body.userID}, function(err , item){
+        if(err){
+            res.status(202).send({error: err});
+        }else{
+            res.status(200).send({message: item});
+        }
+    });
+});
+
 router.route('/checkAuth').post(async function(req, res) {
     const config = process.env;
     var tokenMe = req.headers["x-access-token"];
