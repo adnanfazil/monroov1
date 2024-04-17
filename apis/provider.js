@@ -15,10 +15,15 @@ var Reviews = require('../models/reviews.model');
 function uuidv4() {
     return crypto.randomUUID();
 }
-router.route('/changeField').post(async function(req, res) {
-    Provider.path('subCatID').required(false);
-    Provider.path('subCatID').options.type = Object;
-    returnData(res, "Ok");
+
+router.route('/removeProvider').post(myAuth,async function(req, res) {
+    Provider.deleteMany({id: req.body.userID}, function(err , item){
+        if(err){
+            res.status(202).send({error: err});
+        }else{
+            res.status(200).send({message: item});
+        }
+    });
 });
     router.route('/checkAuth').post(async function(req, res) {
     const config = process.env;
@@ -73,7 +78,8 @@ router.route('/loginSocial').post(myAuth ,function(req, res) {
                 }
                 let token = getToken(item.id , item.email , item.countryOfResidence);
                 item.token = token;
-                item.fcmToken = fcmToken;
+                if(fcmToken)
+                    item.fcmToken = fcmToken;
                 item.status = 200;
                 item.save(function (err) {
                     if (err) {
@@ -105,7 +111,8 @@ router.route('/login').post(myAuth ,function(req, res) {
                 }
                 let token = getToken(item.id , item.email , item.countryOfResidence);
                 item.token = token;
-                item.fcmToken = fcmToken;
+                if(fcmToken)
+                    item.fcmToken = fcmToken;
                 item.status = 200;
                 item.save(function (err) {
                     if (err) {
