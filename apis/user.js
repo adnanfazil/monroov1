@@ -82,7 +82,8 @@ router.route('/loginSocial').post(myAuth ,function(req, res) {
                 }
                 let token = getToken(item.id , item.email , item.country);
                 item.token = token;
-                item.fcmToken = fcmToken;
+                if(fcmToken)
+                    item.fcmToken = fcmToken;
                 item.status = 200;
                 item.save(function (err) {
                     if (err) {
@@ -520,6 +521,7 @@ router.post('/getMessagesProfiles', auth, function (req, res) {
                     data.senderID = item.providerID;
                     data.senderName = sender.fname;
                     data.senderPhoto = sender.profilePic;
+                    data.msgDate = sender.msgDate;
                     response.push(data);
                 }
                 returnData(res , response);
