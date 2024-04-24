@@ -193,6 +193,7 @@ router.post('/Register',[uploadAll,myAuth], async function (req, res, next) {
 
         const { userName: username, email, phone } = body;
         let oldUser = await User.findOne({ $or: [{ id: body.id }, { email: email }, { phone: phone }] });
+        console.log(oldUser);
         if (oldUser)
             return returnError(res, "This user already registered, duplicate email or mobile number");
 
