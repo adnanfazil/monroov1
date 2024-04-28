@@ -648,6 +648,7 @@ router.post('/getBookings', auth,async function (req, res) {
             if(err){
                 returnError(res , err);
             }else{
+                console.log(items);
                 returnData(res , items);
             }
         });
