@@ -479,7 +479,7 @@ router.post('/ApproveDeal', auth, function (req, res) {
                             let permission = await Permission.findOne({userID: userID , providerID: providerID ,eventID : eventID});
                             if(permission){
                                 permission.isWaitingPayment = true;
-                                permission.isAllowed = false;
+                                permission.isAllowed = true;
                                 permission.eventDoneSucces = false;
                                 await permission.save();
                                 return returnData(res , true);

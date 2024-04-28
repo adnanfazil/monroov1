@@ -407,6 +407,8 @@ router.post('/getMessagesProfiles', auth, function (req, res) {
                 var response = [];
                 for(const item of filtered){
                     const sender = await User.findOne({id: item.userID});
+                    if(!sender)
+                      continue;
                     var data = {};
                     data.messageID = item.id;
                     data.senderID = item.userID;

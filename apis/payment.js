@@ -67,6 +67,52 @@ router.route('/checkout').post([myAuth , auth],async function (req, res) {
       });
 });
 
+router.route('/checkoutSim').post([myAuth , auth],async function (req, res) {
+  // const nonceFromTheClient = req.body.nonceFromTheClient;
+  // const deviceData = req.body.deviceData;
+  let amount = req.body.amount;
+  const eventID = req.body.eventID;
+  if(!amount){
+    let event = await Events.findOne({id: eventID});
+    try{
+      Number.parseFloat(event.dealCost);
+      amount = event.dealCost;
+    }catch(err){
+      amount = '0';
+    }
+  }
+  if(amount === '0'){
+    return returnData(res , "Amount not detected");
+  }
+  // const eventID = req.body.eventID;
+  let event = await Events.findOne({id: eventID});
+  if(event){
+    event.status = 3;
+    event.save();
+    return returnData(res , {status: 200 , message: "success"});
+  }
+  // gateway.transaction.sale({
+  //     amount: amount ,//"10.00",
+  //     paymentMethodNonce: nonceFromTheClient,
+  //     deviceData: deviceData,
+  //     options: {
+  //       submitForSettlement: true
+  //     }
+  //   },async (err, result) => {
+  //     if(err)
+  //         return returnError(res , err);
+  //     if(result){
+  //       const eventID = req.body.eventID;
+  //       let event = await Events.findOne({id: eventID});
+  //       if(event){
+  //         event.status = 3;
+  //         event.save();
+  //       }
+  //       return returnData(res , {result: result , event: event});
+  //     }
+  //   });
+});
+
 function returnError(res, error) {
     return res.status(203).send({ status: 203, data: error });
 }
