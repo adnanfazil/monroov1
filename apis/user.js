@@ -22,8 +22,12 @@ router.route('/fcmToken').post(myAuth,async function(req, res) {
         let user = await User.findOne({id: userID});
         user.fcmToken = fcmToken;
         await user.save();
+        console.log(user);
+
         returnData(res , user);
     }else{
+        console.log( "Fcm Token not found");
+
         returnError(res , "Fcm Token not found");
     }
 });

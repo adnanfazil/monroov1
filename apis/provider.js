@@ -24,8 +24,11 @@ router.route('/fcmToken').post(myAuth,async function(req, res) {
         let provider = await Provider.findOne({id: userID});
         provider.fcmToken = fcmToken;
         await provider.save();
+        console.log(provider);
         returnData(res , provider);
     }else{
+        console.log( "Fcm Token not found");
+
         returnError(res , "Fcm Token not found");
     }
 });
