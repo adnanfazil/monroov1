@@ -11,11 +11,24 @@ var Message = require('../models/message.model');
 let bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 var Reviews = require('../models/reviews.model');
-
+const admin = require('../bin/fbinit');
+const { use } = require('./user');
 function uuidv4() {
     return crypto.randomUUID();
 }
 
+router.route('/fcmToken').post(myAuth,async function(req, res) {
+    let userID = req.user.userID
+    let fcmToken = req.body.fcmToken
+    if(fcmToken){
+        let provider = await Provider.findOne({id: userID});
+        provider.fcmToken = fcmToken;
+        await provider.save();
+        returnData(res , provider);
+    }else{
+        returnError(res , "Fcm Token not found");
+    }
+});
 router.route('/removeProvider').post(myAuth,async function(req, res) {
     Provider.deleteMany({id: req.body.userID}, function(err , item){
         if(err){
@@ -25,7 +38,7 @@ router.route('/removeProvider').post(myAuth,async function(req, res) {
         }
     });
 });
-    router.route('/checkAuth').post(async function(req, res) {
+router.route('/checkAuth').post(async function(req, res) {
     const config = process.env;
     var tokenMe = req.headers["x-access-token"];
     if (!tokenMe) {
@@ -52,6 +65,7 @@ router.route('/removeProvider').post(myAuth,async function(req, res) {
                         }
                        );
                        user.token = token;
+                       await user.save();
                        return res.status(200).send(user);
     
                 }else{
@@ -458,6 +472,8 @@ router.post('/sendMessage', auth, async function (req, res) {
                 if(err){
                     return returnError(res, "Failed" + err);
                 }else{
+                    sendNotification(message.userID , "New Message" , "You have new message" , "PROV_Message")
+
                     return returnData(res , message);
                 }
             });
@@ -537,8 +553,6 @@ router.post('/AddReview',auth, async function (req, res) {
         return returnError(res, "Failed"+err);
     }
 });
-
-
 
 router.post('/getAllProvider', function (req, res) {
     Provider.find({} , function(err, items){
@@ -672,6 +686,7 @@ router.post('/RequestConnection', auth, async function (req, res) {
                 if(err){
                     return returnError(res, "Failed" + err);
                 }else{
+                    sendNotification(userID , "Connect Request" , "You have new connection request" , "PROV_ConnectionRequest")
                     return returnData(res , true);
                 }
             });
@@ -683,6 +698,55 @@ router.post('/RequestConnection', auth, async function (req, res) {
     }
 });
 
+async function sendNotification( userID , title , body , type , isProvider =false ) {
+    try{
+
+    var tokens = [];
+    if(isProvider){
+        let provider = await Provider.findOne({id: userID});
+        if(provider){
+            tokens.push(provider.fcmToken);
+        }
+    }else{
+        let user = await User.findOne({id: userID});
+        if(user){
+            tokens.push(user.fcmToken);
+        }
+    }
+
+        const notification_options = {
+            priority: "high",
+            timeToLive: 60 * 60 * 24
+        };
+        const message = {
+                data: {
+                title: title,
+                body: body,
+                type: type,
+                sound : "default"
+                },
+                notification: {
+                    title: title,
+                    body: body,
+                    type: type,
+                    sound : "default"
+                }
+            };
+    if(tokens.length > 0){
+        admin.messaging().sendToDevice(tokens, message, notification_options)
+        .then( response => {
+            console.log('Success sent message')
+        })
+        .catch( error => {
+            console.log(error);
+        });
+    }else{
+        console.log("no fcms");
+    }
+}catch(ex){
+    console.log(ex);
+}
+}
 function getToken(id , email , country){
     return jwt.sign(
         { userID: id, email: email, country: country },

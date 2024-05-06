@@ -13,7 +13,20 @@ const crypto = require('crypto');
 var Permission = require('../models/permission.model');
 let uploadAll = require("../middleware/uploadAll");
 
+const admin = require('../bin/fbinit');
 
+router.route('/fcmToken').post(myAuth,async function(req, res) {
+    let userID = req.user.userID
+    let fcmToken = req.body.fcmToken
+    if(fcmToken){
+        let user = await User.findOne({id: userID});
+        user.fcmToken = fcmToken;
+        await user.save();
+        returnData(res , user);
+    }else{
+        returnError(res , "Fcm Token not found");
+    }
+});
 router.route('/removeUser').post(myAuth,async function(req, res) {
     User.deleteMany({id: req.body.userID}, function(err , item){
         if(err){
@@ -55,6 +68,7 @@ router.route('/checkAuth').post(async function(req, res) {
                         }
                        );
                        user.token = token;
+                       await user.save();
                        return returnData(res , user);
     
                 }else{
@@ -264,6 +278,7 @@ router.post('/cancelEvent',auth, function (req, res) {
                 if(item){
                     item.status = 4;// cancel
                     item.save();
+                    sendNotification(item.providerID , "Event Canceled" , "Event has been canceled" , "Cancel" )
                     return returnData(res, item);
                 }else{
                     return returnError(res, "Failed, event not found");
@@ -413,6 +428,7 @@ router.post('/RequestEvent', auth, async function (req, res) {
                 if(err){
                     return returnError(res, "Failed" + err);
                 }else{
+                    sendNotification(providerID , "Event Requested" , "You have new event request" , "RequestEvent" )
                     return returnData(res , true);
                 }
             });
@@ -442,6 +458,8 @@ router.post('/MakeADeal', auth, async function (req, res) {
                 if(err){
                     return returnError(res, "Failed" + err);
                 }else{
+                    sendNotification(providerID , "Deal Requested" , "You have new event deal request" , "RequestDeal" )
+
                     return returnData(res , true);
                 }
             });
@@ -486,7 +504,10 @@ router.post('/ApproveDeal', auth, function (req, res) {
                                 permission.isAllowed = true;
                                 permission.eventDoneSucces = false;
                                 await permission.save();
+                                sendNotification(userID , "Deal Requested" , "You have new event deal request" , "RequestDeal" , true )
+
                                 return returnData(res , true);
+                                
                             }else{
                                 // create new permission and save
                                 return returnError(res, "Failed, Permission error occured");
@@ -609,6 +630,8 @@ router.post('/ApprovePermission', auth,async function (req, res) {
                 if(err){
                    return returnError(res , err);
                 }else{
+                    sendNotification(providerID , "Message Allowed" , "a conversation has been opend to talk" , "PermissionAproved"  )
+
                     return returnData(res , permission);
                 }
             });
@@ -632,6 +655,8 @@ router.post('/sendMessage', auth, async function (req, res) {
                 if(err){
                     return returnError(res, "Failed" + err);
                 }else{
+                    sendNotification(message.providerID , "New Message" , "You have new message" , "Message"  )
+
                     return returnData(res , message);
                 }
             });
@@ -678,6 +703,57 @@ router.post('/getAllUserBookings', auth,async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
+
+
+async function sendNotification( userID , title , body , type , isUser =false ) {
+    try{
+
+    var tokens = [];
+    if(isUser){
+        let user = await User.findOne({id: userID});
+        if(user){
+            tokens.push(user.fcmToken);
+        }
+    }else{
+        let provider = await Provider.findOne({id: userID});
+        if(provider){
+            tokens.push(provider.fcmToken);
+        }
+    }
+
+        const notification_options = {
+            priority: "high",
+            timeToLive: 60 * 60 * 24
+        };
+        const message = {
+                data: {
+                title: title,
+                body: body,
+                type: type,
+                sound : "default"
+                },
+                notification: {
+                    title: title,
+                    body: body,
+                    type: type,
+                    sound : "default"
+                }
+            };
+    if(tokens.length > 0){
+        admin.messaging().sendToDevice(tokens, message, notification_options)
+        .then( response => {
+            console.log('Success sent message')
+        })
+        .catch( error => {
+            console.log(error);
+        });
+    }else{
+        console.log("no fcms");
+    }
+}catch(ex){
+    console.log(ex);
+}
+}
 function getToken(id , email , country){
     return jwt.sign(
         { userID: id, email: email, country: country },
