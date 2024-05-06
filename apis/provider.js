@@ -703,15 +703,19 @@ router.post('/RequestConnection', auth, async function (req, res) {
 
 async function sendNotification( userID , title , body , type , isProvider =false ) {
     try{
-
+        console.log("user id" , userID);
     var tokens = [];
     if(isProvider){
         let provider = await Provider.findOne({id: userID});
+        console.log("user provider" , provider);
+
         if(provider){
             tokens.push(provider.fcmToken);
         }
     }else{
         let user = await User.findOne({id: userID});
+        console.log("user user" , user);
+
         if(user){
             tokens.push(user.fcmToken);
         }

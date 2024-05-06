@@ -711,15 +711,20 @@ router.post('/getAllUserBookings', auth,async function (req, res) {
 
 async function sendNotification( userID , title , body , type , isUser =false ) {
     try{
+        console.log("user id" , userID);
 
     var tokens = [];
     if(isUser){
         let user = await User.findOne({id: userID});
+        console.log("user user" , user);
+
         if(user){
             tokens.push(user.fcmToken);
         }
     }else{
         let provider = await Provider.findOne({id: userID});
+        console.log("user provider" , provider);
+
         if(provider){
             tokens.push(provider.fcmToken);
         }
