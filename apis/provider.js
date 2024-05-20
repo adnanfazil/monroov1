@@ -574,6 +574,12 @@ router.post('/UpdateProvider', [auth ,uploadAll] ,async function( req, res, next
     const DOMAIN = process.env.DOMAIN_ME;
     let body = Provider(JSON.parse(req.body.data));
     const {images , videos , audios , onevideo , reel , resumeCV , portfolio} = req.files;
+    const {profilePic} = req.files;
+    if(profilePic){
+        for(const item of profilePic){
+            body.profilePic = DOMAIN+'uploads/profilePic/'+item.filename;
+        }
+    }
     if(images){
         let list = [];
         for(const item of images){
