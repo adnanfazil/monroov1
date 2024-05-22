@@ -364,6 +364,37 @@ router.post('/ListProviders', auth, async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
+router.post('/ListOutProviders', myAuth, async function (req, res) {
+    try{
+        // const isAll = req.body.isAll;
+        const isAll = true;
+        const userID = req.user.userID;
+        const user = await User.findOne({id: userID});
+        if(!user){
+           return returnError(res , "User info not detected");
+        }
+        if(isAll){
+            Provider.find({}, function(err, items) {
+                if(err){
+                    return returnError(res , err);
+                }else{
+                    return returnData(res , items);
+                }
+            } );
+            return;
+        }
+        Provider.find({catID: {$in: user.intrestedList} }, function(err, items) {
+            if(err){
+                return returnError(res , err);
+            }else{
+                return returnData(res , items);
+            }
+        } );
+        
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
 
 router.post('/SearchProviders', auth, async function (req, res) {
     try{
