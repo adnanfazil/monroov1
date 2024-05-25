@@ -243,7 +243,7 @@ router.post('/UpdateUser',[uploadAll,myAuth], async function (req, res, next) {
             }
         }
         if (!body) return returnError(res, "Info not detected");
-        const { userName: username, email, phone } = body;
+        const { id: id, email, phone } = body;
         let oldUser = await User.findOne({ $or: [{ id: body.id }, { email: email }, { phone: phone }] });
         console.log(oldUser);
         if (oldUser){
@@ -251,18 +251,27 @@ router.post('/UpdateUser',[uploadAll,myAuth], async function (req, res, next) {
             if (!bcrypt.compareSync(password, oldUser.password)){
                 return returnError(res , "Wrong password");
             }
-            let token = getToken(userID , body.email , body.country);
+            let token = getToken(id , body.email , body.country);
             body.token = token;
-            body.save(function (err) {
-                if (err) {
-                    return returnError(res, "Cannot Register " + err);
-                } else {
-                    body.password = "*******"
-                    return returnData(res, body);
-                }
-            });
+            const doc = await User.findOneAndUpdate({$or:[{id: id },{email:email}]}, body, {
+                new: true
+              });
+            if(doc){
+                doc.password = "******";
+                return returnData(res , doc);
+            }else{
+                return returnError(res , "Error occured");
+            }
+            // body.save(function (err) {
+            //     if (err) {
+            //         return returnError(res, "Cannot Register " + err);
+            //     } else {
+            //         body.password = "*******"
+            //         return returnData(res, body);
+            //     }
+            // });
         }else
-            return returnError(res, "This user already registered, duplicate email or mobile number");
+            return returnError(res, "Cannot find user info");
 
 
     } catch (error) {
