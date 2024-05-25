@@ -232,7 +232,43 @@ router.post('/Register',[uploadAll,myAuth], async function (req, res, next) {
         return returnError(res, "Error " + error);
     }
 });
+router.post('/UpdateUser',[uploadAll,myAuth], async function (req, res, next) {
+    try {
+        const DOMAIN = process.env.DOMAIN_ME;
+        const body = User(JSON.parse(req.body.data));
+        const {profilePic} = req.files;
+        if(profilePic){
+            for(const item of profilePic){
+                body.profilePic = DOMAIN+'uploads/profilePic/'+item.filename;
+            }
+        }
+        if (!body) return returnError(res, "Info not detected");
+        const { userName: username, email, phone } = body;
+        let oldUser = await User.findOne({ $or: [{ id: body.id }, { email: email }, { phone: phone }] });
+        console.log(oldUser);
+        if (oldUser){
+            let password = body.password;
+            if (!bcrypt.compareSync(password, oldUser.password)){
+                return returnError(res , "Wrong password");
+            }
+            let token = getToken(userID , body.email , body.country);
+            body.token = token;
+            body.save(function (err) {
+                if (err) {
+                    return returnError(res, "Cannot Register " + err);
+                } else {
+                    body.password = "*******"
+                    return returnData(res, body);
+                }
+            });
+        }else
+            return returnError(res, "This user already registered, duplicate email or mobile number");
 
+
+    } catch (error) {
+        return returnError(res, "Error " + error);
+    }
+});
 router.post('/CreateEvent', auth, async function (req, res) {
     try{
         const event = Event(req.body);
