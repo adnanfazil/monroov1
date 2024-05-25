@@ -253,6 +253,8 @@ router.post('/UpdateUser',[uploadAll,myAuth], async function (req, res, next) {
             }
             let token = getToken(id , body.email , body.country);
             body.token = token;
+            body._id = oldUser._id;
+            body._v = oldUser._v;
             const doc = await User.findOneAndUpdate({$or:[{id: id },{email:email}]}, body, {
                 new: true
               });
