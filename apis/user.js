@@ -15,6 +15,16 @@ let uploadAll = require("../middleware/uploadAll");
 
 const admin = require('../bin/fbinit');
 
+
+router.route('/getAllUsers').post(myAuth,async function(req, res) {
+    User.find(function(err , item){
+        if(item){
+            returnData(res , item);
+        }else if(err){
+            returnError(res , err);
+        }
+    });
+});
 router.route('/fcmToken').post(auth,async function(req, res) {
     let userID = req.user.userID
     let fcmToken = req.body.fcmToken
