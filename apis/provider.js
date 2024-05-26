@@ -661,8 +661,8 @@ router.post('/UpdateProvider', [auth ,uploadAll] ,async function( req, res, next
             // if (!bcrypt.compareSync(password, oldUser.password)){
             //     return returnError(res , "Wrong password");
             // }
-            let encryptedPassword = await bcrypt.hash(body.password, 10);
-            body.password = encryptedPassword;
+            // let encryptedPassword = await bcrypt.hash(body.password, 10);
+            body.password = oldUser.password;
             const doc = await Provider.findOneAndUpdate({$or:[{id: id},{email:email}]}, body, {
                 new: true
               });

@@ -261,6 +261,7 @@ router.post('/UpdateUser',[uploadAll,myAuth], async function (req, res, next) {
             // if (!bcrypt.compareSync(password, oldUser.password)){
             //     return returnError(res , "Wrong password");
             // }
+            body.password = oldUser.password;
             let token = getToken(id , body.email , body.country);
             body.token = token;
             body._id = oldUser._id;
