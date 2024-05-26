@@ -247,10 +247,10 @@ router.post('/UpdateUser',[uploadAll,myAuth], async function (req, res, next) {
         let oldUser = await User.findOne({ $or: [{ id: body.id }, { email: email }, { phone: phone }] });
         console.log(oldUser);
         if (oldUser){
-            let password = body.password;
-            if (!bcrypt.compareSync(password, oldUser.password)){
-                return returnError(res , "Wrong password");
-            }
+            // let password = body.password;
+            // if (!bcrypt.compareSync(password, oldUser.password)){
+            //     return returnError(res , "Wrong password");
+            // }
             let token = getToken(id , body.email , body.country);
             body.token = token;
             body._id = oldUser._id;
