@@ -253,7 +253,7 @@ router.post('/UpdateUser',[uploadAll,myAuth], async function (req, res, next) {
             }
         }
         if (!body) return returnError(res, "Info not detected");
-        const { id: id, email, phone } = body;
+        const {id, email, phone } = body;
         let oldUser = await User.findOne({ $or: [{ id: body.id }, { email: email }, { phone: phone }] });
         console.log(oldUser);
         if (oldUser){
@@ -266,6 +266,7 @@ router.post('/UpdateUser',[uploadAll,myAuth], async function (req, res, next) {
             body.token = token;
             body._id = oldUser._id;
             body._v = oldUser._v;
+            body.id = oldUser.id;
             const doc = await User.findOneAndUpdate({$or:[{id: id },{email:email}]}, body, {
                 new: true
               });
@@ -520,6 +521,7 @@ router.post('/RequestEvent', auth, async function (req, res) {
 router.post('/MakeADeal', auth, async function (req, res) {
     try{
         const eventID = req.body.eventID;
+        const msgID = req.body.msgID;
         const providerID = req.body.providerID;
         const dealPrice = req.body.dealPrice;
         if(providerID && eventID){
@@ -531,10 +533,18 @@ router.post('/MakeADeal', auth, async function (req, res) {
             message.eventID = eventID;
             message.userID = req.user.userID;
             message.senderID = req.user.userID;
-            message.save(function(err){
+            message.save(async function(err){
                 if(err){
                     return returnError(res, "Failed" + err);
                 }else{
+                    try{
+                        let oldmsg = await Message.findOne({id: msgID});
+                        oldmsg.msgStatus = 4;
+                        oldmsg.save();
+                    }catch(ex){
+                        console.log(ex);
+                    }
+
                     sendNotification(providerID , "Deal Requested" , "You have new event deal request" , "RequestDeal" )
 
                     return returnData(res , true);
@@ -581,6 +591,12 @@ router.post('/ApproveDeal', auth, function (req, res) {
                                 permission.isAllowed = true;
                                 permission.eventDoneSucces = false;
                                 await permission.save();
+                                try{
+                                    messageOld.msgStatus = 4;
+                                    messageOld.save();
+                                }catch(ex){
+                                    console.log(ex);
+                                }
                                 sendNotification(userID , "Deal Requested" , "You have new event deal request" , "RequestDeal" , true )
 
                                 return returnData(res , true);
@@ -684,6 +700,7 @@ router.post('/ApprovePermission', auth,async function (req, res) {
         const userID = req.body.userID;
         const providerID = req.body.providerID;
         const eventID = req.body.eventID;
+        const msgID = req.body.msgID;
         const permissionValue = req.body.permissionValue;
         const paymentwaiting = req.body.paymentwaiting;
         if(userID && providerID && eventID){
@@ -703,12 +720,18 @@ router.post('/ApprovePermission', auth,async function (req, res) {
                 permission.isWaitingPayment = false;
             else
                 permission.isWaitingPayment = paymentwaiting;
-            permission.save(function(err){
+            permission.save(async function(err){
                 if(err){
                    return returnError(res , err);
                 }else{
-                    sendNotification(providerID , "Message Allowed" , "a conversation has been opend to talk" , "PermissionAproved"  )
-
+                    try{
+                        let message = await Message.findOne({id: msgID});
+                        message.msgStatus = 2;
+                        message.save();
+                    }catch(ex){
+                        console.log(ex);
+                    }
+                    sendNotification(providerID , "Message Allowed" , "a conversation has been opend to talk" , "PermissionAproved");
                     return returnData(res , permission);
                 }
             });
