@@ -15,7 +15,15 @@ let uploadAll = require("../middleware/uploadAll");
 
 const admin = require('../bin/fbinit');
 
-
+router.route('/getAllEvents').post(myAuth,async function(req, res) {
+    Event.find(function(err , item){
+        if(item){
+            returnData(res , item);
+        }else if(err){
+            returnError(res , err);
+        }
+    });
+});
 router.route('/getAllUsers').post(myAuth,async function(req, res) {
     User.find(function(err , item){
         if(item){
