@@ -599,7 +599,7 @@ router.post('/ApproveDeal', auth, function (req, res) {
                                 permission.eventDoneSucces = false;
                                 await permission.save();
                                 try{
-                                    messageOld.msgStatus = 4;
+                                    messageOld.msgStatus = 5;
                                     messageOld.save();
                                 }catch(ex){
                                     console.log(ex);

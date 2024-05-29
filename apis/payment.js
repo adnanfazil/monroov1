@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const User = require('../models/users.model');
 const Provider = require('../models/provider.model');
 const Events = require('../models/event.model');
+const Messages = require('../models/message.model');
 //https://developer.paypal.com/braintree/docs/start/hello-server/node
 const gateway = new braintree.BraintreeGateway({
     environment: braintree.Environment.Sandbox,
@@ -58,9 +59,12 @@ router.route('/checkout').post([myAuth , auth],async function (req, res) {
         if(result){
           const eventID = req.body.eventID;
           let event = await Events.findOne({id: eventID});
+          let msgObj = await Messages.findOne({id: eventID});
           if(event){
+            msgObj.msgStatus = 6;
             event.status = 3;
             event.save();
+            msgObj.save();
           }
           return returnData(res , {result: result , event: event});
         }
