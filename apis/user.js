@@ -496,6 +496,14 @@ router.post('/RequestEvent', auth, async function (req, res) {
     try{
         const eventID = req.body.eventID;
         const providerID = req.body.providerID;
+        let msgs = await Message.find({$and: [
+            {eventID: eventID},
+             {msgStatus: {$ne:3}}
+            ]
+        });
+        if(msgs && msgs.length > 0){
+            return returnError(res, "This event has been requested before");
+        }
         let event = await Event.findOne({id: eventID});
         if(event && event.status == 4){
             return returnError(res, "This event has been canceled, please create new one");

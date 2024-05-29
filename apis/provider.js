@@ -688,6 +688,14 @@ router.post('/RequestConnection', auth, async function (req, res) {
     try{
         const eventID = req.body.eventID;
         const userID = req.body.userID;
+        let msgs = await Message.find({$and: [
+            {eventID: eventID},
+             {msgStatus: {$ne:3}}
+            ]
+        });
+        if(msgs && msgs.length > 0){
+            return returnError(res, "Connection request has been sent before");
+        }
         if(userID && eventID){
             var message = Message();
             message.id = crypto.randomUUID();
