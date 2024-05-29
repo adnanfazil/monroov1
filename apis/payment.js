@@ -58,7 +58,6 @@ router.route('/checkout').post([myAuth , auth],async function (req, res) {
         if(err)
             return returnError(res , err);
         if(result){
-          const eventID = req.body.eventID;
           let event = await Events.findOne({id: eventID});
           let msgObj = await Messages.findOne({id: msgId});
           if(event){
