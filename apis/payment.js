@@ -34,6 +34,7 @@ router.route('/checkout').post([myAuth , auth],async function (req, res) {
     const deviceData = req.body.deviceData;
     let amount = req.body.amount;
     const eventID = req.body.eventID;
+    const msgId = req.body.msgId;
     if(!amount){
       let event = await Events.findOne({id: eventID});
       try{
@@ -59,7 +60,7 @@ router.route('/checkout').post([myAuth , auth],async function (req, res) {
         if(result){
           const eventID = req.body.eventID;
           let event = await Events.findOne({id: eventID});
-          let msgObj = await Messages.findOne({id: eventID});
+          let msgObj = await Messages.findOne({id: msgId});
           if(event){
             msgObj.msgStatus = 6;
             event.status = 3;
