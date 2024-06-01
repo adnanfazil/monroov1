@@ -581,17 +581,8 @@ router.post('/RejectDeal', auth, async function (req, res) {
         if(userID && providerID && eventID , msgID){
                 var messageOld = await Message.findOne({id : msgID });
                 if(messageOld){
-
-                    var message = Message();
-                    message.id = crypto.randomUUID();
-                    message.msg = messageOld.msg;
-                    message.type = messageOld.type;
-                    message.providerID = providerID;
-                    message.eventID = eventID;
-                    message.userID = userID;
-                    message.senderID = providerID;
-                    message.msgStatus = 7;
-                    message.save(async function(err){
+                    messageOld.msgStatus = 7;
+                    messageOld.save(async function(err){
                         if(err){
                             return returnError(res, "Failed" + err);
                         }else{
