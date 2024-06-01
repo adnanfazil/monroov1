@@ -36,6 +36,10 @@ router.route('/getAllUsers').post(myAuth,async function(req, res) {
 
 router.route('/getUserById').post(myAuth,async function(req, res) {
     const {userID} = req.body.userID;
+    console.log("USER" , userID)
+    if(!userID){
+        return returnError(res , "User not found");
+    }
     User.findOne({id: userID},function(err , item){
         if(item){
             returnData(res , item);
