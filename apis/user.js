@@ -418,7 +418,7 @@ router.post('/ListProviders', auth, async function (req, res) {
             } );
             return;
         }
-        Provider.find({catID: {$in: user.intrestedList} }, function(err, items) {
+        Provider.find({catID: {$in: user.intrestedList} ,averageRatePerHour:{$ne: ""}}, function(err, items) {
             if(err){
                 return returnError(res , err);
             }else{
