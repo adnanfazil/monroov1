@@ -572,7 +572,49 @@ router.post('/MakeADeal', auth, async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
+router.post('/RejectDeal', auth, async function (req, res) {
+    try{
+        const userID = req.body.userID;
+        const providerID = req.body.providerID;
+        const eventID = req.body.eventID;
+        const msgID = req.body.msgID;
+        if(userID && providerID && eventID , msgID){
+                var messageOld = await Message.findOne({id : msgID });
+                if(messageOld){
 
+                    var message = Message();
+                    message.id = crypto.randomUUID();
+                    message.msg = messageOld.msg;
+                    message.type = messageOld.type;
+                    message.providerID = providerID;
+                    message.eventID = eventID;
+                    message.userID = userID;
+                    message.senderID = providerID;
+                    message.msgStatus = 7;
+                    message.save(async function(err){
+                        if(err){
+                            return returnError(res, "Failed" + err);
+                        }else{
+                   
+                                sendNotification(userID , "Deal Rejected" , "a deal has been rejected" , "RejectDeal" , true )
+
+                                return returnData(res , true);
+         
+                        }
+                    });
+                }else{
+                    return returnError(res, "Failed, Event not found");
+                }
+  
+ 
+        }else{
+            return returnError(res, "wrong sent data");
+        }
+
+    }catch(err){
+        return returnError(res, err.message);
+    }
+});
 router.post('/ApproveDeal', auth, function (req, res) {
     try{
         const userID = req.body.userID;
