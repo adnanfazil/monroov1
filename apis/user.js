@@ -33,6 +33,17 @@ router.route('/getAllUsers').post(myAuth,async function(req, res) {
         }
     });
 });
+
+router.route('/getUserById').post(myAuth,async function(req, res) {
+    const {userID} = req.body.userID;
+    User.findOne({id: userID},function(err , item){
+        if(item){
+            returnData(res , item);
+        }else if(err){
+            returnError(res , err);
+        }
+    });
+});
 router.route('/fcmToken').post(auth,async function(req, res) {
     let userID = req.user.userID
     let fcmToken = req.body.fcmToken
@@ -409,7 +420,7 @@ router.post('/ListProviders', auth, async function (req, res) {
            return returnError(res , "User info not detected");
         }
         if(isAll){
-            Provider.find( function(err, items) {
+            Provider.find({dob:{ $exists: true, $ne: null, $not: { $eq: "" }}}, function(err, items) {
                 if(err){
                     return returnError(res , err);
                 }else{
