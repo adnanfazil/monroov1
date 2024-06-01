@@ -892,7 +892,7 @@ router.post('/getBookings', auth,async function (req, res) {
                     }
                 });    
             }else{
-                Event.find({userID: userID, async function(err , items){
+                Event.find({userID: userID}, async function(err , items){
                     if(err){
                         returnError(res , err);
                     }else{
