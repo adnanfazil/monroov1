@@ -409,7 +409,7 @@ router.post('/ListProviders', auth, async function (req, res) {
            return returnError(res , "User info not detected");
         }
         if(isAll){
-            Provider.find({dob:{$ne: ''}}, function(err, items) {
+            Provider.find({averageRatePerHour:{$ne: ""}}, function(err, items) {
                 if(err){
                     return returnError(res , err);
                 }else{
