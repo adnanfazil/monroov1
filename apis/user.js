@@ -758,6 +758,55 @@ router.post('/ApprovePermission', auth,async function (req, res) {
         return returnError(res, err);
     }
 });
+
+router.post('/DeclinePermission', auth,async function (req, res) {
+    try{
+        const userID = req.body.userID;
+        const providerID = req.body.providerID;
+        const eventID = req.body.eventID;
+        const msgID = req.body.msgID;
+        const permissionValue = req.body.permissionValue;
+        const paymentwaiting = req.body.paymentwaiting;
+        if(userID && providerID && eventID){
+            let permission = await Permission.findOne({userID: userID, providerID: providerID, eventID: eventID});
+            if(!permission || !permission.id){
+                permission = new Permission();
+                permission.id = crypto.randomUUID();
+            }
+            permission.eventID = eventID;
+            permission.providerID = providerID;
+            permission.userID = userID;
+            if(permissionValue === undefined || permissionValue === null)
+                permission.isAllowed = false;
+            else
+                permission.isAllowed = permissionValue;
+            if(paymentwaiting === undefined || paymentwaiting === null)
+                permission.isWaitingPayment = false;
+            else
+                permission.isWaitingPayment = paymentwaiting;
+            permission.save(async function(err){
+                if(err){
+                   return returnError(res , err);
+                }else{
+                    try{
+                        let message = await Message.findOne({id: msgID});
+                        message.msgStatus = 3;
+                        message.save();
+                    }catch(ex){
+                        console.log(ex);
+                    }
+                    sendNotification(providerID , "Request Declined" , "Someone has declined your request" , "PermissionDeclined");
+                    return returnData(res , permission);
+                }
+            });
+        }else{
+            return returnError(res, "wrong sent data");
+        }
+
+    }catch(err){
+        return returnError(res, err);
+    }
+});
 router.post('/sendMessage', auth, async function (req, res) {
     try{
         const message = Message(req.body); 
