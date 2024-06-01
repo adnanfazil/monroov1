@@ -874,7 +874,7 @@ router.post('/getBookings', auth,async function (req, res) {
         const userID = req.user.userID;
         if(bookingStatus){
             if(bookingStatus === 1){
-                Event.find({userID: userID, status: {$ne: 4} }, async function(err , items){
+                Event.find({userID: userID, status: {$ne: 4} , eventDate: {$gt: currentTimestampInMilliseconds} }, async function(err , items){
                     if(err){
                         returnError(res , err);
                     }else{
@@ -883,7 +883,7 @@ router.post('/getBookings', auth,async function (req, res) {
                     }
                 }); 
             }else if(bookingStatus === 2){
-                Event.find({userID: userID, eventDate: {$gt: currentTimestampInMilliseconds} }, async function(err , items){
+                Event.find({userID: userID, eventDate: {$lt: currentTimestampInMilliseconds} }, async function(err , items){
                     if(err){
                         returnError(res , err);
                     }else{
