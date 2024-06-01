@@ -409,7 +409,7 @@ router.post('/ListProviders', auth, async function (req, res) {
            return returnError(res , "User info not detected");
         }
         if(isAll){
-            Provider.find({dob:{$and:{ $exists: true, $ne: null, $not: { $eq: "" } }}}, function(err, items) {
+            Provider.find({dob:{ $exists: true, $ne: null, $not: { $eq: "" }}}, function(err, items) {
                 if(err){
                     return returnError(res , err);
                 }else{
