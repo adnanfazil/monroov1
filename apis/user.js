@@ -35,7 +35,7 @@ router.route('/getAllUsers').post(myAuth,async function(req, res) {
 });
 
 router.route('/getUserById').post(myAuth,async function(req, res) {
-    const {userID} = req.body.userID;
+    const {userID} = req.body;
     console.log("USER" , userID)
     if(!userID){
         return returnError(res , "User not found");
