@@ -409,7 +409,7 @@ router.post('/ListProviders', auth, async function (req, res) {
            return returnError(res , "User info not detected");
         }
         if(isAll){
-            Provider.find({dob:{$and:[{$exists: true}, {$ne: null}, {$ne: ""}]}}, function(err, items) {
+            Provider.find({dob:{$and:{ $exists: true, $ne: null, $not: { $eq: "" } }}}, function(err, items) {
                 if(err){
                     return returnError(res , err);
                 }else{
@@ -418,7 +418,7 @@ router.post('/ListProviders', auth, async function (req, res) {
             } );
             return;
         }
-        Provider.find({catID: {$in: user.intrestedList} ,dob:{$and:[{$exists: true}, {$ne: null}, {$ne: ""}]}}, function(err, items) {
+        Provider.find({catID: {$in: user.intrestedList} ,dob:{ $exists: true, $ne: null, $not: { $eq: "" } }}, function(err, items) {
             if(err){
                 return returnError(res , err);
             }else{
