@@ -869,15 +869,50 @@ router.post('/sendMessage', auth, async function (req, res) {
 router.post('/getBookings', auth,async function (req, res) {
     try{
         const currentTimestampInMilliseconds = new Date().getTime();
+
+        const bookingStatus = req.body.bookingStatus;
         const userID = req.user.userID;
-        Event.find({userID: userID, status: {$ne: 4} }, async function(err , items){
-            if(err){
-                returnError(res , err);
+        if(bookingStatus){
+            if(bookingStatus === 1){
+                Event.find({userID: userID, status: {$ne: 4} }, async function(err , items){
+                    if(err){
+                        returnError(res , err);
+                    }else{
+                        console.log(items);
+                        returnData(res , items);
+                    }
+                }); 
+            }else if(bookingStatus === 2){
+                Event.find({userID: userID, eventDate: {$gt: currentTimestampInMilliseconds} }, async function(err , items){
+                    if(err){
+                        returnError(res , err);
+                    }else{
+                        console.log(items);
+                        returnData(res , items);
+                    }
+                });    
             }else{
-                console.log(items);
-                returnData(res , items);
+                Event.find({userID: userID, async function(err , items){
+                    if(err){
+                        returnError(res , err);
+                    }else{
+                        console.log(items);
+                        returnData(res , items);
+                    }
+                });   
             }
-        });
+        }else{
+
+            Event.find({userID: userID, status: {$ne: 4} }, async function(err , items){
+                if(err){
+                    returnError(res , err);
+                }else{
+                    console.log(items);
+                    returnData(res , items);
+                }
+            });
+        }
+
     }catch(err){
         return returnError(res, "Data Not Correct");
     }
