@@ -350,6 +350,7 @@ router.post('/GetEvents',auth , async function (req, res) {
         //     }
         // });
         // Use aggregate to perform a lookup between two models
+        let currentDate = Date.now().toString();
         Event.aggregate([
         {
                 $match: {
@@ -357,7 +358,7 @@ router.post('/GetEvents',auth , async function (req, res) {
                         { status: 0 },
                         { status: 4 }
                     ],
-                    eventDate: { $gt:  Date.now().toString() } // Current date and time
+                    // eventDate: { $gt:  currentDate } // Current date and time
                 }
             },
         {
