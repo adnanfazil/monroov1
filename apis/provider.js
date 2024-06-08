@@ -802,7 +802,7 @@ function returnError(res , error){
     return res.status(203).send({status: 203 , data: error});
 }
 function returnData(res , data){
-    console.log(data);
+    // console.log(data);
     return res.status(200).send({status: 200 , data: data});
 }
 
