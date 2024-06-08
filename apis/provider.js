@@ -351,6 +351,7 @@ router.post('/GetEvents',auth , async function (req, res) {
         // });
         // Use aggregate to perform a lookup between two models
         let currentDate = Date.now().toString();
+        console.log(currentDate);
         Event.aggregate([
         {
                 $match: {
