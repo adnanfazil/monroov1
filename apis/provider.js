@@ -358,7 +358,7 @@ router.post('/GetEvents',auth , async function (req, res) {
                         { status: 0 },
                         { status: 4 }
                     ],
-                    // eventDate: { $gt:  currentDate } // Current date and time
+                    eventDate: { $gt:  currentDate } // Current date and time
                 }
             },
         {
