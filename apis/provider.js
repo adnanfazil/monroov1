@@ -354,8 +354,11 @@ router.post('/GetEvents',auth , async function (req, res) {
             {
                 $addFields: {
                     eventDateAsDate: {
-                        $dateFromString: {
-                            dateString: "$eventDate"
+                        $convert: {
+                            input: "$eventDate",
+                            to: "date",
+                            onError: null, // If conversion fails, set the field to null
+                            onNull: null  // If the field is null, set the field to null
                         }
                     }
                 }
