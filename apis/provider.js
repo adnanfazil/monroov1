@@ -381,7 +381,8 @@ router.post('/GetEvents',auth , async function (req, res) {
             country: 1,
             dealCost: 1,
             status: 1,
-            userName: '$userDetails.name'
+            userName: '$userDetails.name',
+            profilePic: '$userDetails.profilePic'
         }
         }
     ]).exec((err, results) => {
