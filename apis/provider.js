@@ -351,13 +351,13 @@ router.post('/GetEvents',auth , async function (req, res) {
         // });
         // Use aggregate to perform a lookup between two models
         Event.aggregate([
-            {
+        {
                 $match: {
                     $or: [
                         { status: 0 },
                         { status: 4 }
-                    ],
-                    eventDate: { $gt: new Date() } // Current date and time
+                    ]
+                    // eventDate: { $gt: new Date() } // Current date and time
                 }
             },
         {
