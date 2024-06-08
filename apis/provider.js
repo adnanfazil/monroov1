@@ -351,6 +351,15 @@ router.post('/GetEvents',auth , async function (req, res) {
         // });
         // Use aggregate to perform a lookup between two models
         Event.aggregate([
+            {
+                $match: {
+                    $or: [
+                        { status: 0 },
+                        { status: 4 }
+                    ],
+                    eventDate: { $gt: new Date() } // Current date and time
+                }
+            },
         {
         $lookup: {
             from: 'users', // name as mongo named it with s at last
@@ -372,11 +381,13 @@ router.post('/GetEvents',auth , async function (req, res) {
             desc: 1,
             createdDate: 1,
             eventDate: 1,
+            eventEndDate: 1,
             userID: 1,
             providerID: 1,
             catID: 1,
             subCatID: 1,
             duration: 1,
+            gender: 1,
             averageCost: 1,
             country: 1,
             dealCost: 1,
