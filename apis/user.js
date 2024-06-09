@@ -859,10 +859,11 @@ router.post('/sendMessage', auth, async function (req, res) {
     try{
         const message = Message(req.body); 
         if(message){
+            const currentTimestampInMilliseconds = new Date().getTime();
             message.id = crypto.randomUUID();
             message.userID = req.user.userID;
             message.senderID = req.user.userID;
-            message.msgDate = Date.now();
+            message.msgDate = currentTimestampInMilliseconds;
             message.save(function(err){
                 if(err){
                     return returnError(res, "Failed" + err);

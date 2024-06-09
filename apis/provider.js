@@ -378,7 +378,7 @@ router.post('/GetEvents',auth , async function (req, res) {
             console.error(err);
             return returnError(res, "Failed"+err);
         }
-        console.log(results);
+        // console.log(results);
         return returnData(res, results);
     });
     }catch(err){
@@ -463,10 +463,11 @@ router.post('/sendMessage', auth, async function (req, res) {
     try{
         const message = Message(req.body); 
         if(message){
+            const currentTimestampInMilliseconds = new Date().getTime();
             message.id = crypto.randomUUID();
             message.providerID = req.user.userID;
             message.senderID = req.user.userID;
-            message.msgDate = Date.now();
+            message.msgDate = currentTimestampInMilliseconds;
             message.save(function(err){
                 if(err){
                     return returnError(res, "Failed" + err);
