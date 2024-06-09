@@ -583,6 +583,54 @@ router.post('/getAllProvider', function (req, res) {
     });
 });
 
+router.route('/checkAuth').post(async function(req, res) {
+    const config = process.env;
+    var tokenMe = req.headers["x-access-token"];
+    if (!tokenMe) {
+        return returnError(res , "Token not sent");
+    }else{
+        try {
+            const decoded = jwt.verify(tokenMe, config.JWT_KEY);
+            req.user = decoded;
+            let userID = req.user.userID
+            var provider = await Provider.findOne({id: userID});
+            if(!provider){
+                return returnError(res , "User Not Found");
+            }
+            return returnData(res , provider);
+        } catch (err) {
+            try{
+                if(err.name === 'TokenExpiredError') {
+                    const payload = jwt.verify(tokenMe, config.JWT_KEY, {ignoreExpiration: true} );
+                    var userID = payload.userID;
+                    var provider = await Provider.findOne({id: userID});
+                    var email = provider.email;
+                    var country = provider.country;
+                    let token = jwt.sign(
+                        { userID: userID, email: email, country: country },
+                            process.env.JWT_KEY,
+                        {
+                           expiresIn: "24h",
+                        }
+                       );
+                       provider.token = token;
+                       await provider.save();
+                       return returnData(res , provider);
+    
+                }else{
+                    console.log("err not expired but other exception :" + err);
+                    return returnError(res , "Token is not valid ." + err);
+                }
+            }catch(err){
+                console.log(err);
+                return returnError(res , "Token is not valid "+ err.message);
+
+            }
+
+          }
+    }
+
+});
 router.post('/UpdateProvider', [auth ,uploadAll] ,async function( req, res, next) {
     try {
     const DOMAIN = process.env.DOMAIN_ME;
