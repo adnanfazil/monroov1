@@ -359,7 +359,7 @@ router.post('/GetEvents',auth , async function (req, res) {
         },
         {
             $sort: {
-                createdDate: -1 // Sort by eventDate in descending order
+                eventDate: -1 // Sort by eventDate in descending order
             }
         }
     ]).exec((err, results) => {
