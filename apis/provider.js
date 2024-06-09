@@ -426,8 +426,9 @@ router.post('/getMessagesProfiles', auth, function (req, res) {
                     data.senderID = item.userID;
                     data.senderName = sender.name;
                     data.senderPhoto = sender.profilePic;
+                    data.msgDate = item.msgDate;
                     response.push(data);
-                }5
+                }
                 returnData(res , response);
             }
         });

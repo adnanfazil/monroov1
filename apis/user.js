@@ -705,7 +705,7 @@ router.post('/getMessagesProfiles', auth, function (req, res) {
                     data.senderID = item.providerID;
                     data.senderName = sender.fname;
                     data.senderPhoto = sender.profilePic;
-                    data.msgDate = sender.msgDate;
+                    data.msgDate = item.msgDate;
                     response.push(data);
                 }
                 returnData(res , response);
