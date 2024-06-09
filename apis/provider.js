@@ -356,6 +356,11 @@ router.post('/GetEvents',auth , async function (req, res) {
             userName: '$userDetails.name',
             profilePic: '$userDetails.profilePic'
         }
+        },
+        {
+            $sort: {
+                createdDate: -1 // Sort by eventDate in descending order
+            }
         }
     ]).exec((err, results) => {
         if (err) {
