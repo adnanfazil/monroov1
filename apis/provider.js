@@ -336,6 +336,17 @@ router.post('/GetEvents',auth , async function (req, res) {
         }
         },
         {
+            $addFields: {
+                normalizedEventDate: {
+                    $cond: {
+                        if: { $isNumber: "$eventDate" }, // Check if eventDate is a number (Unix timestamp)
+                        then: { $toDate: { $multiply: ["$eventDate", 1000] } }, // Convert Unix timestamp to JavaScript Date
+                        else: "$eventDate" // Assume it is already a JavaScript Date object
+                    }
+                }
+            }
+        },
+        {
         $project: {
             id: 1,
             title: 1,
@@ -359,7 +370,7 @@ router.post('/GetEvents',auth , async function (req, res) {
         },
         {
             $sort: {
-                eventDate: 1 // Sort by eventDate in descending order
+                normalizedEventDate: 1 // Sort by eventDate in descending order
             }
         }
     ]).exec((err, results) => {
