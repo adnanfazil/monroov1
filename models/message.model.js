@@ -13,7 +13,7 @@ const schema = new Schema({
    eventID: {type: String , default: ""},
    msgDate: {type: String , default: ""},
    eventObj: {type: event, default: null},
-   msgStatus: {type: Number, default: 1},// 1 - still / normal , 2- Approved , 3- rejected/declined , 4- DealSent , 5- DealApproved  , 6- Payed , 7- DealRejected
+   msgStatus: {type: Number, default: 1},// 1 - still / normal , 2- Approved , 3- request rejected/declined , 4- DealSent , 5- DealApproved  , 6- Payed , 7- DealRejected
 });
 
 
