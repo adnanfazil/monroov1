@@ -335,7 +335,46 @@ router.post('/CreateEvent', auth, async function (req, res) {
         return returnError(res, "Data Not Correct");
     }
 });
-
+router.route('/removeEvent').post(myAuth,async function(req, res) {
+    Event.deleteMany({id: req.body.id}, function(err , item){
+        if(err){
+            res.status(202).send({error: err});
+        }else{
+            res.status(200).send({message: item});
+        }
+    });
+});
+router.post('/SaveEvent', auth, async function (req, res) {
+    try{
+        const {id , ...newEventData } = req.body;
+        let oldEvent = await Event.findOne({id : id});
+        if(oldEvent){
+               // Update the oldEvent with new data
+                Object.assign(oldEvent, newEventData);
+                await oldEvent.save();
+                return returnData(res , oldEvent);
+            }else{
+                returnError(res , "Event not found");
+        }
+        const event = Event(req.body);
+        event.userID = req.user.userID;
+        event.country = req.user.country;
+        if(event){
+            event.id = crypto.randomUUID();
+            event.save(function(err){
+                if(err){
+                    return returnError(res, "Failed" + err);
+                }else{
+                    return returnData(res , event);
+                }
+            });
+        }else{
+            return returnError(res, "Data Not Correct");
+        }
+    }catch(err){
+        return returnError(res, "Data Not Correct");
+    }
+});
 
 
 router.post('/GetUserEvents',auth, function (req, res) {
