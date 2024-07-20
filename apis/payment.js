@@ -163,13 +163,13 @@ router.route('/complete').get( async function (req,res){
     "items": [
       {
         "name": 'User => ' + userID,
-        "amount": amount,
+        "amount": (amount / 2),
         "description": eventID,
         "quantity": 1
       }, 
       {
         "name": 'Provider => ' + providerID,
-        "amount": amount,
+        "amount": (amount / 2),
         "description": eventID,
         "quantity": 1
       }
