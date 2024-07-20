@@ -229,7 +229,7 @@ router.route('/complete').get( async function (req,res){
         
       });
     })
-    .catch(error => returnError(res, error));
+    .catch(error => {console.log(error);returnError(res, error);});
 });
 
 
