@@ -180,7 +180,7 @@ router.route('/complete').get( async function (req,res){
       "last_name": userID,
       "street": "",
       "building": user.companyName,
-      "phone_number": phone.phone,
+      "phone_number": user.phone,
       "country": user.country,
       "email": user.email,
       "floor": "",
