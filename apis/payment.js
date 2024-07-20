@@ -144,7 +144,7 @@ router.route('/complete').get( async function (req,res){
     let event = await Events.findOne({id: eventID});
     try{
       Number.parseFloat(event.dealCost);
-      amount = event.dealCost;
+      amount = event.dealCost * 1000;
     }catch(err){
       amount = '0';
     }
@@ -206,7 +206,7 @@ router.route('/complete').get( async function (req,res){
     body: raw,
     redirect: `follow`
   };
-  
+  //http://51.21.127.77:3000/monroo/apis/payment/complete?eventID=${eventID}&msgID=${msgID}
   fetch("https://uae.paymob.com/v1/intention/", requestOptions)
     .then(response => response.json())
     .then(async result  =>  {
