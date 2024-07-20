@@ -158,7 +158,7 @@ router.route('/complete').get( async function (req,res){
     "amount": amount,
     "currency": "AED",
     "payment_methods": [
-      "46394"
+      46394
     ],
     "items": [
       {
