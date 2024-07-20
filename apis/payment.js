@@ -186,7 +186,7 @@ router.route('/complete').get( async function (req,res){
       "floor": "",
       "state": ""
     },
-    "special_reference": Date.now +'-' + eventID,
+    "special_reference": uuidv4() +'-' + eventID,
     "customer": {
       "first_name": provider.fname,
       "last_name": provider.lname,
@@ -233,7 +233,9 @@ router.route('/complete').get( async function (req,res){
     .catch(error => {console.log(error);returnError(res, error);});
 });
 
-
+function uuidv4() {
+  return crypto.randomUUID();
+}
 
 function returnError(res, error) {
     return res.status(203).send({ status: 203, data: error });
