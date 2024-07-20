@@ -210,6 +210,7 @@ router.route('/complete').get( async function (req,res){
   fetch("https://uae.paymob.com/v1/intention/", requestOptions)
     .then(response => response.json())
     .then(async result  =>  {
+      console.log(result);
       let payData = new PaymentIntention(result);
       try{
         // let event = await Events.findOne({id: eventID});
