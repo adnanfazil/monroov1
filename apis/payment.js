@@ -138,8 +138,8 @@ router.route('/complete').get( async function (req,res){
   var myHeaders = new Headers();
   myHeaders.append("Authorization", "are_sk_test_d054a488295d122b90d8577a516e933d399dccc2002ef9d7f58f038ebbc1010e");
   myHeaders.append("Content-Type", "application/json");
-
-  const { amount,  userID , providerID , eventID ,msgID } = req.body;
+    let amount = req.body.amount;
+  const {   userID , providerID , eventID ,msgID } = req.body;
   if(!amount){
     let event = await Events.findOne({id: eventID});
     try{
