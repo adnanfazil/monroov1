@@ -186,7 +186,7 @@ router.route('/complete').get( async function (req,res){
       "floor": "",
       "state": ""
     },
-    "special_reference": eventID,
+    "special_reference": Date.now +'-' + eventID,
     "customer": {
       "first_name": provider.fname,
       "last_name": provider.lname,
