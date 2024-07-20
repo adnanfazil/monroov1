@@ -136,7 +136,7 @@ router.route('/complete').get( async function (req,res){
 });
   router.route('/newCheckout').post([myAuth , auth] , async function (req,res){
   var myHeaders = new Headers();
-  myHeaders.append("Authorization", "are_sk_test_d054a488295d122b90d8577a516e933d399dccc2002ef9d7f58f038ebbc1010e");
+  myHeaders.append("Authorization", "Token are_sk_test_d054a488295d122b90d8577a516e933d399dccc2002ef9d7f58f038ebbc1010e");
   myHeaders.append("Content-Type", "application/json");
     let amount = req.body.amount;
   const {   userID , providerID , eventID ,msgID } = req.body;
