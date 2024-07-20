@@ -204,7 +204,7 @@ router.route('/complete').get( async function (req,res){
     method: 'POST',
     headers: myHeaders,
     body: raw,
-    redirect: `http://51.21.127.77:3000/monroo/apis/payment/complete?eventID=${eventID}&msgID=${msgID}`
+    redirect: `follow`
   };
   
   fetch("https://uae.paymob.com/v1/intention/", requestOptions)
