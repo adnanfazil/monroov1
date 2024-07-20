@@ -11,6 +11,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const User = require('../models/users.model');
 const Provider = require('../models/provider.model');
+const PaymentIntention = require('../models/payment.model');
 const Events = require('../models/event.model');
 const Messages = require('../models/message.model');
 //https://developer.paypal.com/braintree/docs/start/hello-server/node
@@ -116,6 +117,122 @@ router.route('/checkoutSim').post([myAuth , auth],async function (req, res) {
   //     }
   //   });
 });
+
+router.route('/complete').get( async function (req,res){
+  let eventID = req.query.eventID;
+  let msgID = req.query.msgID;
+  if(eventID && msgID){
+    let event = await Events.findOne({id: eventID});
+    let msgObj = await Messages.findOne({id: msgID});
+    if(event){
+      msgObj.msgStatus = 6;
+      event.status = 3;
+      event.save();
+      msgObj.save();
+    }
+  }
+  res.redirect('http://monroo.co/');
+
+});
+  router.route('/newCheckout').post([myAuth , auth] , async function (req,res){
+  var myHeaders = new Headers();
+  myHeaders.append("Authorization", "are_sk_test_d054a488295d122b90d8577a516e933d399dccc2002ef9d7f58f038ebbc1010e");
+  myHeaders.append("Content-Type", "application/json");
+
+  const { amount,  userID , providerID , eventID ,msgID } = req.body;
+  if(!amount){
+    let event = await Events.findOne({id: eventID});
+    try{
+      Number.parseFloat(event.dealCost);
+      amount = event.dealCost;
+    }catch(err){
+      amount = '0';
+    }
+  }
+  if(amount === '0'){
+    return returnData(res , "Amount not detected");
+  }
+  let user = await User.findOne({id: userID});
+  let provider = await Provider.findOne({id: providerID});
+  var raw = JSON.stringify({
+    "amount": amount,
+    "currency": "AED",
+    "payment_methods": [
+      "46394"
+    ],
+    "items": [
+      {
+        "name": 'User => ' + userID,
+        "amount": amount,
+        "description": eventID,
+        "quantity": 1
+      }, 
+      {
+        "name": 'Provider => ' + providerID,
+        "amount": amount,
+        "description": eventID,
+        "quantity": 1
+      }
+    ],
+    "billing_data": {
+      "apartment": "6",
+      "first_name": user.name,
+      "last_name": userID,
+      "street": "",
+      "building": user.companyName,
+      "phone_number": phone.phone,
+      "country": user.country,
+      "email": user.email,
+      "floor": "",
+      "state": ""
+    },
+    "special_reference": eventID,
+    "customer": {
+      "first_name": provider.fname,
+      "last_name": provider.lname,
+      "email": provider.email,
+      "extras": {
+        "re": providerID
+      }
+    },
+    "extras": {
+      "ee": 0
+    }
+  });
+  
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: `http://51.21.127.77:3000/monroo/apis/payment/complete?eventID=${eventID}&msgID=${msgID}`
+  };
+  
+  fetch("https://uae.paymob.com/v1/intention/", requestOptions)
+    .then(response => response.json())
+    .then(async result  =>  {
+      let payData = new PaymentIntention(result);
+      try{
+        // let event = await Events.findOne({id: eventID});
+        // let msgObj = await Messages.findOne({id: msgID});
+        // if(event){
+        //   msgObj.msgStatus = 6;
+        //   event.status = 3;
+        //   event.save();
+        //   msgObj.save();
+        // }
+      }catch(ex){
+
+      }
+
+      payData.save(function(err){
+        returnData(res , payData)
+        
+      });
+    })
+    .catch(error => returnError(res, error));
+});
+
+
 
 function returnError(res, error) {
     return res.status(203).send({ status: 203, data: error });
