@@ -339,17 +339,17 @@ router.post('/GetEvents',auth , async function (req, res) {
             $addFields: {
                 normalizedEventDate: {
                     $cond: {
-                        if: { $eq: ["$createdDate", ""] }, // Check if createdDate is an empty string
+                        if: { $eq: ["$eventDate", ""] }, // Check if createdDate is an empty string
                         then: null, // Set to null if empty
                         else: {
                             $cond: {
-                                if: { $regexMatch: { input: "$createdDate", regex: /^\d+$/ } }, // Check if createdDate is a number string (Unix timestamp)
-                                then: { $toDate: { $toLong: "$createdDate" } }, // Convert Unix timestamp string to JavaScript Date
+                                if: { $regexMatch: { input: "$eventDate", regex: /^\d+$/ } }, // Check if createdDate is a number string (Unix timestamp)
+                                then: { $toDate: { $toLong: "$eventDate" } }, // Convert Unix timestamp string to JavaScript Date
                                 else: {
                                     $cond: {
-                                        if: { $regexMatch: { input: "$createdDate", regex: /^\d{2}-\d{2}-\d{4}$/ } }, // Check if createdDate is in 'dd-MM-yyyy' format
-                                        then: { $dateFromString: { dateString: "$createdDate", format: "%d-%m-%Y" } }, // Convert 'dd-MM-yyyy' string to JavaScript Date
-                                        else: { $toDate: "$createdDate" } // Assume it's an ISO date string and convert to JavaScript Date
+                                        if: { $regexMatch: { input: "$eventDate", regex: /^\d{2}-\d{2}-\d{4}$/ } }, // Check if createdDate is in 'dd-MM-yyyy' format
+                                        then: { $dateFromString: { dateString: "$eventDate", format: "%d-%m-%Y" } }, // Convert 'dd-MM-yyyy' string to JavaScript Date
+                                        else: { $toDate: "$eventDate" } // Assume it's an ISO date string and convert to JavaScript Date
                                     }
                                 }
                             }
