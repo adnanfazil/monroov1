@@ -382,7 +382,7 @@ router.post('/GetEvents',auth , async function (req, res) {
         },
         {
             $sort: {
-                normalizedEventDate: -1 // Sort by eventDate in descending order
+                normalizedEventDate: 1 // Sort by eventDate in descending order
             }
         }
     ]).exec((err, results) => {
