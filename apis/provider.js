@@ -345,7 +345,13 @@ router.post('/GetEvents',auth , async function (req, res) {
                             $cond: {
                                 if: { $regexMatch: { input: "$createdDate", regex: /^\d+$/ } }, // Check if createdDate is a number string (Unix timestamp)
                                 then: { $toDate: { $toLong: "$createdDate" } }, // Convert Unix timestamp string to JavaScript Date
-                                else: { $dateFromString: { dateString: "$createdDate", format: "%d-%m-%Y" } } // Convert date string to JavaScript Date with specified format
+                                else: {
+                                    $cond: {
+                                        if: { $regexMatch: { input: "$createdDate", regex: /^\d{2}-\d{2}-\d{4}$/ } }, // Check if createdDate is in 'dd-MM-yyyy' format
+                                        then: { $dateFromString: { dateString: "$createdDate", format: "%d-%m-%Y" } }, // Convert 'dd-MM-yyyy' string to JavaScript Date
+                                        else: { $toDate: "$createdDate" } // Assume it's an ISO date string and convert to JavaScript Date
+                                    }
+                                }
                             }
                         }
                     }
