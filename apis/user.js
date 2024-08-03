@@ -400,10 +400,36 @@ router.post('/cancelEvent',auth, function (req, res) {
                 return returnError(res, "Failed"+err);
             }else {
                 if(item){
-                    item.status = 4;// cancel
-                    item.save();
-                    sendNotification(item.providerID , "Event Canceled" , "Event has been canceled" , "Cancel" )
-                    return returnData(res, item);
+                    if(item.providerID){
+                        var message = Message();
+                        message.id = crypto.randomUUID();
+                        message.msg = "";
+                        message.type = 1;
+                        message.providerID = item.providerID;
+                        message.eventID = eventID;
+                        message.userID =  req.user.userID === item.providerID ? item.userID: item.providerID  ;
+                        message.senderID =req.user.userID === item.providerID ? item.userID: item.providerID ;
+                        message.msgStatus = 3;
+                        message.save(function(err){
+                            if(err){
+                                return returnError(res, "Failed" + err);
+                            }else{
+                                // return returnData(res , true);
+                                        
+                                item.status = 4;// cancel
+                                item.save();
+                                sendNotification(item.providerID , "Event Canceled" , "Event has been canceled" , "Cancel" )
+                                return returnData(res, item);
+                            }
+                        });
+                    }else{
+                        item.status = 4;// cancel
+                        item.save();
+                        sendNotification(item.providerID , "Event Canceled" , "Event has been canceled" , "Cancel" )
+                        return returnData(res, item);
+                    }
+
+
                 }else{
                     return returnError(res, "Failed, event not found");
                 }

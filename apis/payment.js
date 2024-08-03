@@ -75,16 +75,10 @@ router.route('/checkout').post([myAuth , auth],async function (req, res) {
 router.route('/checkoutSim').post([myAuth , auth],async function (req, res) {
   // const nonceFromTheClient = req.body.nonceFromTheClient;
   // const deviceData = req.body.deviceData;
-  let amount = req.body.amount;
+  let transID = req.body.transID;
   const eventID = req.body.eventID;
-  if(!amount){
-    let event = await Events.findOne({id: eventID});
-    try{
-      Number.parseFloat(event.dealCost);
-      amount = event.dealCost;
-    }catch(err){
-      amount = '0';
-    }
+  if(!transID){
+    return returnError(res , "Error trans id not valid");
   }
   if(amount === '0'){
     return returnData(res , "Amount not detected");
@@ -159,6 +153,8 @@ router.route('/complete').get( async function (req,res){
   var raw = JSON.stringify({
     "amount": amount,
     "currency": "AED",
+    "notification_url": "",
+    "redirection_url": "http://monroo.co/checkout-status?eventID="+eventID+"&userID="+userID+"&providerID="+providerID,
     "payment_methods": [
       46394
     ],
@@ -213,7 +209,10 @@ router.route('/complete').get( async function (req,res){
     .then(response => response.json())
     .then(async result  =>  {
       console.log(result);
-      let payData = new PaymentIntention(result);
+      let payData = PaymentIntention(result);
+      payData.userID = userID;
+      payData.providerID = providerID;
+      payData.eventID = eventID;
       try{
         // let event = await Events.findOne({id: eventID});
         // let msgObj = await Messages.findOne({id: msgID});

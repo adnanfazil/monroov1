@@ -42,6 +42,9 @@ const ExtrasSchema = new Schema({
 const PaymentIntentionSchema = new Schema({
   payment_keys: [PaymentKeySchema],
   id: String,
+  userID: String,
+  providerID: String,
+  eventID: String,
   intention_detail: IntentionDetailSchema,
   client_secret: String,
   payment_methods: [PaymentMethodSchema],
