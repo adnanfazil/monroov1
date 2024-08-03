@@ -153,7 +153,6 @@ router.route('/complete').get( async function (req,res){
   var raw = JSON.stringify({
     "amount": amount,
     "currency": "AED",
-    "notification_url": "",
     "redirection_url": "http://monroo.co/checkout-status?eventID="+eventID+"&userID="+userID+"&providerID="+providerID,
     "payment_methods": [
       46394
