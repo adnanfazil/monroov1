@@ -337,19 +337,19 @@ router.post('/GetEvents',auth , async function (req, res) {
         },
         {
             $addFields: {
-                    normalizedEventDate: {
-                        $cond: {
-                            if: { $isNumber: "$eventDate" }, // Check if createdDate is a number (Unix timestamp)
-                            then: { $toDate: { $multiply: ["$eventDate", 1000] } }, // Convert Unix timestamp to JavaScript Date
-                            else: {
-                                $cond: {
-                                    if: { $type: "$eventDate" == "string" }, // Check if createdDate is a string
-                                    then: { $dateFromString: { dateString: "$eventDate" } }, // Convert string to JavaScript Date
-                                    else: "$eventDate" // Assume it is already a JavaScript Date object
-                                }
+                normalizedEventDate: {
+                    $cond: {
+                        if: { $eq: ["$createdDate", ""] }, // Check if createdDate is an empty string
+                        then: null, // Set to null if empty
+                        else: {
+                            $cond: {
+                                if: { $regexMatch: { input: "$createdDate", regex: /^\d+$/ } }, // Check if createdDate is a number string (Unix timestamp)
+                                then: { $toDate: { $toLong: "$createdDate" } }, // Convert Unix timestamp string to JavaScript Date
+                                else: { $dateFromString: { dateString: "$createdDate", format: "%d-%m-%Y" } } // Convert date string to JavaScript Date with specified format
                             }
                         }
                     }
+                }
             }
         },
         {
