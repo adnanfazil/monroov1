@@ -337,7 +337,6 @@ router.post('/GetEvents',auth , async function (req, res) {
         },
         {
             $addFields: {
-                $addFields: {
                     normalizedEventDate: {
                         $cond: {
                             if: { $isNumber: "$createdDate" }, // Check if createdDate is a number (Unix timestamp)
@@ -351,7 +350,6 @@ router.post('/GetEvents',auth , async function (req, res) {
                             }
                         }
                     }
-                }
             }
         },
         {
