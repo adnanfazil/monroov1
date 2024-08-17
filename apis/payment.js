@@ -187,7 +187,7 @@ router.route('/complete').get( async function (req,res){
     "customer": {
       "first_name": provider.fname,
       "last_name": provider.lname,
-      "email": provider.email,
+      "email": 'nizar.abuahmad@gmail.com'  , //provider.email,
       "extras": {
         "re": providerID
       }

@@ -1,6 +1,8 @@
 var app = require('../app');
 var debug = require('debug')('findme:server');
-var http = require('http');
+// var http = require('http');
+const http = require("https");
+
 const mongoose = require('mongoose');
 
 const port = process.argv[2] || process.env.PORT || 3000;
