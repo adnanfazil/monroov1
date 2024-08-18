@@ -1,7 +1,7 @@
 var app = require('../app');
 var debug = require('debug')('findme:server');
 // var http = require('http');
-const http = require("https");
+const http = require("http");
 
 const mongoose = require('mongoose');
 
