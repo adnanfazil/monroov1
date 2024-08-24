@@ -1,29 +1,40 @@
 trigger:
-- main
+  branches:
+    include:
+      - main
 
 pool:
-  name: 'Default'
+  vmImage: 'ubuntu-latest'
+
+variables:
+  sshHost: "ec2-user@16.16.249.59"  # Update with your EC2 user and public IP
+  sshKey: $(sshKey)  # The SSH key will be stored securely in Azure DevOps
 
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '20.x'
-  displayName: 'Install Node.js'
+    versionSpec: '20.x'  # Use the Node.js version compatible with your app
+    checkLatest: true
 
 - script: |
     npm install
-    npm run build
-  displayName: 'Install dependencies and build'
+    npm run build  # If your application requires a build step
+  displayName: 'Install Dependencies and Build'
 
-- task: ArchiveFiles@2
+- task: CopyFilesOverSSH@0
   inputs:
-    rootFolderOrFile: '$(Build.SourcesDirectory)'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    replaceExistingArchive: true
-  displayName: 'Archive files'
+    sshEndpoint: '2244'  # Use the service connection with the custom SSH port
+    sourceFolder: '$(Build.SourcesDirectory)'
+    targetFolder: '/home/ec2-user/app'  # Update with the path on your EC2 instance
+    cleanTargetFolder: true
 
-- publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-  artifact: drop
-  displayName: 'Publish Artifact'
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
+    runOptions: 'inline'
+    inline: |
+      cd /home/ec2-user/app  # Update with the path on your EC2 instance
+      npm install
+      pm2 stop all || true  # Stop any existing Node.js processes
+      pm2 start app.js  # Start the application with PM2
+  displayName: 'Deploy and Start Application'
