@@ -9,26 +9,27 @@ pool:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '18.x'  # Specify the Node.js version
-  displayName: 'Install Node.js'
+    versionSpec: '20.x'  # Use the Node.js version compatible with your app
+    checkLatest: true
 
 - script: |
     npm install
-  displayName: 'Install dependencies'
+  displayName: 'Install Dependencies and Build'
 
-- script: |
-    npm start
-  displayName: 'Run application'
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
+    sourceFolder: '$(Build.SourcesDirectory)'
+    targetFolder: '/home/ec2-user/app'  # Update with the path on your EC2 instance
+    cleanTargetFolder: true
 
-- script: |
-    npm audit --audit-level=high
-  displayName: 'Audit for vulnerabilities'
-
-# Uncomment and customize the following steps if you have tests or linting
-# - script: |
-#     npm test
-#   displayName: 'Run tests'
-
-# - script: |
-#     npm run lint
-#   displayName: 'Lint code'
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
+    runOptions: 'inline'
+    inline: |
+      cd /home/ec2-user/app  # Update with the path on your EC2 instance
+      npm install
+      pm2 stop all || true  # Stop any existing Node.js processes
+      pm2 start app.js  # Start the application with PM2
+  displayName: 'Deploy and Start Application'
