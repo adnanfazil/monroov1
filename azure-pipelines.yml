@@ -6,10 +6,6 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  sshHost: "ec2-user@16.16.249.59"  # Update with your EC2 user and public IP
-  sshKey: $(sshKey)  # The SSH key will be stored securely in Azure DevOps
-
 steps:
 - task: NodeTool@0
   inputs:
