@@ -23,7 +23,7 @@ steps:
 
 - task: CopyFilesOverSSH@0
   inputs:
-    sshEndpoint: '2244'  # Use the service connection with the custom SSH port
+    sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
     sourceFolder: '$(Build.SourcesDirectory)'
     targetFolder: '/home/ec2-user/app'  # Update with the path on your EC2 instance
     cleanTargetFolder: true
