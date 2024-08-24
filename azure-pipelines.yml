@@ -4,31 +4,22 @@ trigger:
       - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Default'  # or the name of your custom pool with the self-hosted agent
 
 steps:
-- task: NodeTool@0
+- task: UseNode@2
   inputs:
-    versionSpec: '20.x'  # Specify the Node.js version
-  displayName: 'Install Node.js'
+    versionSpec: '20.x' # Use the appropriate Node.js version
+    checkLatest: true
 
 - script: |
     npm install
-  displayName: 'Install dependencies'
+    npm run build # Optional: If your package requires a build step
+  displayName: 'Install and Build'
 
 - script: |
-    npm start
-  displayName: 'Run application'
-
-- script: |
-    npm audit --audit-level=high
-  displayName: 'Audit for vulnerabilities'
-
-# Uncomment and customize the following steps if you have tests or linting
-# - script: |
-#     npm test
-#   displayName: 'Run tests'
-
-# - script: |
-#     npm run lint
-#   displayName: 'Lint code'
+    echo "//registry.npmjs.org/:_authToken=$(NPM_TOKEN)" > ~/.npmrc
+    npm publish
+  env:
+    NPM_TOKEN: $(npm_token)  # Define this in your pipeline variables
+  displayName: 'Publish to NPM'
