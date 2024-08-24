@@ -14,6 +14,13 @@ function uuidv4() {
     return crypto.randomUUID();
 }
 
+/**
+ * @swagger
+ * tags:
+ * name: lookups
+ */
+
+
 //////////// Categories
 router.route('/addCategory').post(myAuth, async function(req, res) {
     try{
@@ -54,7 +61,33 @@ router.route('/addCategories').post(myAuth,async function(req, res) {
 });
 
 
-router.route('/getCategories').post(myAuth,function(req, res) {
+
+/**
+ * @swagger
+ * /monroo/apis/lookups/getCategories:
+ *   get:
+ *     summary: Retrieve all categories
+ *     description: Get a list of all categories from the database.
+ *     responses:
+ *       200:
+ *         description: A list of categories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: The category's ID
+ *                   name:
+ *                     type: string
+ *                     description: The name of the category
+ *       500:
+ *         description: Internal server error
+ */
+router.route('/getCategories').get(function(req, res) {
     try{
         Category.find(function (err, item) {
             if(err){

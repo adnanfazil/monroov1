@@ -30,6 +30,8 @@
         "nodemon": "^2.0.16",
         "pm2": "^5.2.0",
         "pug": "^3.0.2",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1",
         "uuid": "^9.0.0"
     },
     "author": "Salah Alawadi",
