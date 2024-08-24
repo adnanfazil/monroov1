@@ -17,7 +17,7 @@ const swaggerDefinition = {
 
 const options = {
     swaggerDefinition,
-    apis: ['./apis/lookups.js'],
+    apis: ['./apis/lookups.js','./apis/payment.js', './apis/provider.js', './apis/user.js'],
 };
 
 const specs = swaggerJsdoc(options);
