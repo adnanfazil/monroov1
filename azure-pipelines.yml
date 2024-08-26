@@ -47,6 +47,4 @@ steps:
       npm install
       pm2 stop all || true  # Stop any existing Node.js processes
       pm2 start bin/www.js
-      pm2 start app.js
-      pm2 start swagger.js
   displayName: 'Deploy and Start Application'
