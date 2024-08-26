@@ -33,7 +33,7 @@ steps:
     sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
     sourceFolder: '$(Pipeline.Workspace)'
     contents: '$(appName).tar.gz'
-    targetFolder: '/home/ec2-user/app'  # Update with the path on your EC2 instance
+    targetFolder: '/home/ec2-user/monroobackend'  # Update with the path on your EC2 instance
     cleanTargetFolder: true
 
 - task: SSH@0
@@ -41,7 +41,7 @@ steps:
     sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
     runOptions: 'inline'
     inline: |
-      cd /home/ec2-user/app
+      cd /home/ec2-user/monroobackend
       tar -xzf $(appName).tar.gz
       rm $(appName).tar.gz
       npm install
