@@ -23,8 +23,10 @@ steps:
   displayName: 'Install Dependencies and Build'
 
 - script: |
-    tar -czf $(appName).tar.gz -C $(Build.SourcesDirectory) .
-  displayName: 'Compress Application'
+    mkdir -p $(Pipeline.Workspace)/temp
+    cp -R $(Build.SourcesDirectory)/* $(Pipeline.Workspace)/temp/
+    tar -czf $(Pipeline.Workspace)/$(appName).tar.gz -C $(Pipeline.Workspace)/temp .
+  displayName: 'Copy to Temp Directory and Compress Application'
 
 - task: CopyFilesOverSSH@0
   inputs:
