@@ -44,8 +44,9 @@ steps:
       cd /home/ec2-user/app
       tar -xzf $(appName).tar.gz
       rm $(appName).tar.gz
-      cp -r ../monroobackend/public/* public/
       npm install
       pm2 stop all || true  # Stop any existing Node.js processes
       pm2 start bin/www.js
+      pm2 start app.js
+      pm2 start swagger.js
   displayName: 'Deploy and Start Application'
