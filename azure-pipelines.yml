@@ -6,6 +6,11 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  sshHost: "ec2-user@your-ec2-instance-ip"  # Replace with your EC2 user and public IP
+  sshKey: $(sshKey)  # The SSH key will be stored securely in Azure DevOps
+  appName: "Monroobackend"  # Replace with your application's name
+
 steps:
 - task: NodeTool@0
   inputs:
@@ -14,12 +19,18 @@ steps:
 
 - script: |
     npm install
+#npm run build  # If your application requires a build step
   displayName: 'Install Dependencies and Build'
+
+- script: |
+    tar -czf $(appName).tar.gz -C $(Build.SourcesDirectory) .
+  displayName: 'Compress Application'
 
 - task: CopyFilesOverSSH@0
   inputs:
     sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
-    sourceFolder: '$(Build.SourcesDirectory)'
+    sourceFolder: '$(Pipeline.Workspace)'
+    contents: '$(appName).tar.gz'
     targetFolder: '/home/ec2-user/app'  # Update with the path on your EC2 instance
     cleanTargetFolder: true
 
@@ -28,7 +39,9 @@ steps:
     sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
     runOptions: 'inline'
     inline: |
-      cd /home/ec2-user/app  # Update with the path on your EC2 instance
+      cd /home/ec2-user/app
+      tar -xzf $(appName).tar.gz
+      rm $(appName).tar.gz
       npm install
       pm2 stop all || true  # Stop any existing Node.js processes
       pm2 start app.js  # Start the application with PM2
