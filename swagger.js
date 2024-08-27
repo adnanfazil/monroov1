@@ -10,7 +10,7 @@ const swaggerDefinition = {
         description: 'A simple Express API',
     },
     servers: [{
-        url: 'http://localhost:3000',
+        url: 'https://api.monroo.co',
     }, ],
 };
 
