@@ -1,0 +1,16 @@
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
+
+const schema = new Schema({
+   id: {type: String , unique: true},
+   userID: {type: String , default: ""},
+   providerID: {type: String , default: ""},
+   eventID: {type: String , default: ""},
+   isAllowed: {type: Boolean , default: false},
+   isWaitingPayment: {type: Boolean , default: false},
+   eventDoneSucces: {type: Boolean , default: false}
+});
+
+
+module.exports = mongoose.model('Permission', schema);

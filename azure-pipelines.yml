@@ -1,0 +1,35 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'  # Use the Node.js version compatible with your app
+    checkLatest: true
+
+- script: |
+    npm install
+  displayName: 'Install Dependencies and Build'
+
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
+    sourceFolder: '$(Build.SourcesDirectory)'
+    targetFolder: '/home/ec2-user/app'  # Update with the path on your EC2 instance
+    cleanTargetFolder: true
+
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'AWS-EC2-CustomPort'  # Use the service connection with the custom SSH port
+    runOptions: 'inline'
+    inline: |
+      cd /home/ec2-user/app  # Update with the path on your EC2 instance
+      npm install
+      pm2 stop all || true  # Stop any existing Node.js processes
+      pm2 start app.js  # Start the application with PM2
+  displayName: 'Deploy and Start Application'
