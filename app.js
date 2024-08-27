@@ -12,9 +12,9 @@ const swaggerSetup = require('./swagger');
 
 const corsOptions = {
   credentials: true,
-  origin: ['http://localhost:3000', '*'] // Change * to react domain hosting in future
+  origin: ['*'] // Change * to react domain hosting in future
 };
-app.use(cors()); // Use the cors middleware with your options
+app.use(cors(corsOptions)); // Use the cors middleware with your options
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
