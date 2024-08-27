@@ -14,7 +14,7 @@ const corsOptions = {
   credentials: true,
   origin: ['*'] // Change * to react domain hosting in future
 };
-app.use(cors()); // Use the cors middleware with your options
+app.use(cors(corsOptions)); // Use the cors middleware with your options
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
