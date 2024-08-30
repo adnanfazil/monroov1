@@ -25,8 +25,10 @@ steps:
 - script: |
     mkdir -p $(Pipeline.Workspace)/temp
     cp -R $(Build.SourcesDirectory)/* $(Pipeline.Workspace)/temp/
+    cp -R $(Build.SourcesDirectory)/.[^.]* $(Pipeline.Workspace)/temp/  # Copy hidden files and directories
     tar -czf $(Pipeline.Workspace)/$(appName).tar.gz -C $(Pipeline.Workspace)/temp .
   displayName: 'Copy to Temp Directory and Compress Application'
+
 
 - task: CopyFilesOverSSH@0
   inputs:
