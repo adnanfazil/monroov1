@@ -47,6 +47,8 @@ const schema = new Schema({
   demoReel: { type: String, default: "" },
   token: { type: String, default: "" },
   fcmToken: { type: String, default: "" },
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
   averageRating: { type: Number, default: 0 }, // Average rating on a scale of 0-5
   totalRatings: { type: Number, default: 0 }, // Total number of ratings received
 });

@@ -962,7 +962,7 @@ router.post(
  *       500:
  *         description: Internal server error, issue during registration.
  */
-router.post("/Register", [uploadAll, myAuth], async function (req, res, next) {
+router.post("/Register", uploadAll, async function (req, res, next) {
   try {
     const DOMAIN = process.env.DOMAIN_ME;
     const body = User(JSON.parse(req.body.data));
@@ -1004,6 +1004,89 @@ router.post("/Register", [uploadAll, myAuth], async function (req, res, next) {
     });
   } catch (error) {
     return returnError(res, "Error " + error);
+  }
+});
+
+/**
+ * @swagger
+ * /monroo/apis/provider/forgetPassword:
+ *   post:
+ *     summary: Request a password reset for a provider
+ *     tags: [Provider]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The email address of the provider requesting a password reset.
+ *                 example: provider@example.com
+ *     responses:
+ *       200:
+ *         description: Password reset email sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: A success message indicating that the reset email has been sent.
+ *                   example: An e-mail has been sent with further instructions
+ *       400:
+ *         description: Bad request if the email is not provided or invalid
+ *       404:
+ *         description: Provider not found
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post("/forgetPassword", async function (req, res) {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return returnError(res, "User not found");
+    }
+
+    const resetToken = generateResetToken();
+    const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetTokenExpiry;
+    await user.save();
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Password Reset",
+      text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+        Please click on the following link, or paste this into your browser to complete the process:\n\n
+        http://${req.headers.host}/reset-password/${resetToken}\n\n
+        If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return returnData(res, {
+      message: "An e-mail has been sent with further instructions",
+    });
+  } catch (error) {
+    return returnError(
+      res,
+      "Error in forget password process: " + error.message
+    );
   }
 });
 
@@ -3114,7 +3197,7 @@ router.post("/DeclinePermission", auth, async function (req, res) {
  *       500:
  *         description: Internal server error if there is an issue with the database or server.
  */
-router.post("/sendMessage", auth, async function (req, res) {
+router.post("/sendMessage", async function (req, res) {
   try {
     const message = Message(req.body);
     if (message) {
@@ -3123,20 +3206,20 @@ router.post("/sendMessage", auth, async function (req, res) {
       message.userID = req.user.userID;
       message.senderID = req.user.userID;
       message.msgDate = currentTimestampInMilliseconds;
-      message.save(function (err) {
-        if (err) {
-          return returnError(res, "Failed" + err);
-        } else {
-          sendNotification(
-            message.providerID,
-            "New Message",
-            "You have new message",
-            "Message"
-          );
+      message.conversationId = `${req.user.userID}_${message.providerID}`;
+      await message.save();
 
-          return returnData(res, message);
-        }
-      });
+      // Emit Socket.IO event
+      req.app.get("io").to(message.conversationId).emit("newMessage", message);
+
+      sendNotification(
+        message.providerID,
+        "New Message",
+        "You have new message",
+        "Message"
+      );
+
+      return returnData(res, message);
     } else {
       return returnError(res, "Data Not Correct");
     }
