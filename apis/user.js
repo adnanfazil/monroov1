@@ -5,6 +5,9 @@ var Provider = require("../models/provider.model");
 var Event = require("../models/event.model");
 var Message = require("../models/message.model");
 var Reviews = require("../models/reviews.model");
+var Category = require("../models/category.model");
+var SubCategory = require("../models/subcategory.model");
+
 let jwt = require("jsonwebtoken");
 let auth = require("../middleware/auth");
 let myAuth = require("../middleware/myAuth");
@@ -3439,6 +3442,91 @@ function getToken(id, email, country) {
     }
   );
 }
+
+/**
+ * @swagger
+ * /monroo/apis/user/mobileCategories/{categoryId}:
+ *   get:
+ *     summary: Get category and its subcategories
+ *     tags: [User]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the category
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved category and subcategories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 category:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     nameAR:
+ *                       type: string
+ *                     nameRUS:
+ *                       type: string
+ *                 subcategories:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       nameAR:
+ *                         type: string
+ *                       nameRUS:
+ *                         type: string
+ *       404:
+ *         description: Category not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/mobileCategories/:categoryId", async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+
+    // Find the category
+    const category = await Category.findOne({ id: categoryId });
+
+    if (!category) {
+      return returnError(res, "Category not found");
+    }
+
+    // Find subcategories for the given category
+    const subcategories = await SubCategory.find({ catID: categoryId });
+
+    const result = {
+      category: {
+        id: category.id,
+        name: category.name,
+        nameAR: category.nameAR,
+        nameRUS: category.nameRUS,
+      },
+      subcategories: subcategories.map((sub) => ({
+        id: sub.id,
+        name: sub.name,
+        nameAR: sub.nameAR,
+        nameRUS: sub.nameRUS,
+      })),
+    };
+
+    return returnData(res, result);
+  } catch (error) {
+    return returnError(res, "Error fetching categories: " + error.message);
+  }
+});
 function returnError(res, error) {
   return res.status(203).send({ status: 203, data: error });
 }
