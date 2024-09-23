@@ -4,38 +4,29 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "Monroo API",
+    title: "Monroo",
     version: "1.0.0",
-    description: "API documentation for Monroo application",
+    description: "A simple Express API",
   },
   servers: [
     {
-      url: "https://vconnect.agency",
-      description: "Production server",
+      url: "https://api.monroo.co",
     },
   ],
-  components: {
-    securitySchemes: {
-      BearerAuth: {
-        type: "http",
-        scheme: "bearer",
-        bearerFormat: "JWT",
-      },
-    },
-  },
 };
 
 const options = {
   swaggerDefinition,
-  apis: ["./apis/*.js", "./swagger-schemas.js"],
+  apis: [
+    "./apis/lookups.js",
+    "./apis/payment.js",
+    "./apis/provider.js",
+    "./apis/user.js",
+  ],
 };
 
 const specs = swaggerJsdoc(options);
 
 module.exports = (app) => {
-  app.use(
-    "/api-docs",
-    swaggerUi.serve,
-    swaggerUi.setup(specs, { explorer: true })
-  );
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 };
