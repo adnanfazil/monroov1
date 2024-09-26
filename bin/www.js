@@ -11,13 +11,15 @@ const databaseURL = process.env.MONGO_URL;
 app.set("port", port);
 
 //  mongoose.connect(databaseURL, {useNewUrlParser: true  });
-mongoose.connect(
-  "mongodb+srv://adnanfazil911:fdWuqpO8zI3mPsyV@cluster0.gtbw7.mongodb.net/",
-  {
-    useNewUrlParser: true,
-  }
-);
-//  mongoose.connect('mongodb://salah:salah4488366@localhost:27017/monroodb', {useNewUrlParser: true  });
+// mongoose.connect(
+//   "mongodb+srv://adnanfazil911:fdWuqpO8zI3mPsyV@cluster0.gtbw7.mongodb.net/",
+//   {
+//     useNewUrlParser: true,
+//   }
+// );
+mongoose.connect("mongodb://salah:salah4488366@localhost:27017/monroodb", {
+  useNewUrlParser: true,
+});
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
