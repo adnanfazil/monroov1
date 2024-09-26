@@ -6,14 +6,17 @@ const http = require("http");
 const mongoose = require("mongoose");
 
 const port = process.argv[2] || process.env.PORT || 3000;
-const databaseURL = process.env.DATABASE_URL;
+const databaseURL = process.env.MONGO_URL;
 
 app.set("port", port);
 
 //  mongoose.connect(databaseURL, {useNewUrlParser: true  });
-mongoose.connect("mongodb://localhost:27017/monroodblast", {
-  useNewUrlParser: true,
-});
+mongoose.connect(
+  "mongodb+srv://adnanfazil911:fdWuqpO8zI3mPsyV@cluster0.gtbw7.mongodb.net/",
+  {
+    useNewUrlParser: true,
+  }
+);
 //  mongoose.connect('mongodb://salah:salah4488366@localhost:27017/monroodb', {useNewUrlParser: true  });
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
@@ -34,6 +37,7 @@ io.attach(server, {
 });
 
 server.listen(port, () => {
+  console.log(process.env.MONGO_URL);
   console.log(`Server running at http://localhost:${port}/`);
 });
 server.on("error", onError);
