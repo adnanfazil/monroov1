@@ -27,88 +27,6 @@ function uuidv4() {
 
 /**
  * @swagger
- * /monroo/apis/provider/forgetPassword:
- *   post:
- *     summary: Request a password reset for a provider
- *     tags: [Provider]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: The email address of the provider requesting a password reset.
- *                 example: provider@example.com
- *     responses:
- *       200:
- *         description: Password reset email sent successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: A success message indicating that the reset email has been sent.
- *                   example: An e-mail has been sent with further instructions
- *       400:
- *         description: Bad request if the email is not provided or invalid
- *       404:
- *         description: Provider not found
- *       500:
- *         description: Internal server error
- */
-router.post("/forgetPassword", async function (req, res) {
-  try {
-    const { email } = req.body;
-    const provider = await Provider.findOne({ email });
-
-    if (!provider) {
-      return returnError(res, "Provider not found");
-    }
-
-    const resetToken = crypto.randomBytes(20).toString("hex");
-    const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
-
-    provider.resetPasswordToken = resetToken;
-    provider.resetPasswordExpires = resetTokenExpiry;
-    await provider.save();
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: provider.email,
-      subject: "Password Reset",
-      text: `You are receiving this because you (or someone else) have requested the reset of the password for your provider account.\n\n
-          Please click on the following link, or paste this into your browser to complete the process:\n\n
-          http://${req.headers.host}/reset-password/${resetToken}\n\n
-          If you did not request this, please ignore this email and your password will remain unchanged.\n`,
-    };
-
-    await transporter.sendMail(mailOptions);
-    return returnData(res, {
-      message: "An e-mail has been sent with further instructions",
-    });
-  } catch (error) {
-    return returnError(
-      res,
-      "Error in forget password process: " + error.message
-    );
-  }
-});
-
-/**
- * @swagger
  * /monroo/apis/provider/fcmToken:
  *   post:
  *     summary: Update the FCM token for a provider
@@ -682,52 +600,56 @@ router.post(
  *       500:
  *         description: Internal server error.
  */
-router.post("/EasyRegister", uploadAll, async function (req, res, next) {
-  try {
-    const DOMAIN = process.env.DOMAIN_ME;
-    let body = Provider(JSON.parse(req.body.data));
-    const { profilePic } = req.files;
-    if (profilePic) {
-      for (const item of profilePic) {
-        body.profilePic = DOMAIN + "uploads/profilePic/" + item.filename;
-      }
-    } else {
-      body.profilePic = "";
-    }
-
-    body.id = uuidv4();
-    console.log(body);
-    if (body) {
-      const { id, email, phone } = body;
-      let oldUser = await Provider.findOne({
-        $or: [{ id: id }, { email: email }, { phone: phone }],
-      });
-      if (oldUser) {
-        return returnError(
-          res,
-          "This user already registered, duplicate email , username , id or mobile number"
-        );
+router.post(
+  "/EasyRegister",
+  [uploadAll, myAuth],
+  async function (req, res, next) {
+    try {
+      const DOMAIN = process.env.DOMAIN_ME;
+      let body = Provider(JSON.parse(req.body.data));
+      const { profilePic } = req.files;
+      if (profilePic) {
+        for (const item of profilePic) {
+          body.profilePic = DOMAIN + "uploads/profilePic/" + item.filename;
+        }
       } else {
-        let encryptedPassword = await bcrypt.hash(body.password, 10);
-        body.password = encryptedPassword;
-        let token = getToken(body.id, body.email, body.countryOfResidence);
-        body.token = token;
-        body.save(function (err) {
-          if (err) {
-            return returnError(res, "Cannot Register " + err);
-          } else {
-            body.password = "*******";
-            return returnData(res, body);
-          }
-        });
+        body.profilePic = "";
       }
-    } else {
-      return returnError(res, "Info not detected");
+
+      body.id = uuidv4();
+      console.log(body);
+      if (body) {
+        const { id, email, phone } = body;
+        let oldUser = await Provider.findOne({
+          $or: [{ id: id }, { email: email }, { phone: phone }],
+        });
+        if (oldUser) {
+          return returnError(
+            res,
+            "This user already registered, duplicate email , username , id or mobile number"
+          );
+        } else {
+          let encryptedPassword = await bcrypt.hash(body.password, 10);
+          body.password = encryptedPassword;
+          let token = getToken(body.id, body.email, body.countryOfResidence);
+          body.token = token;
+          body.save(function (err) {
+            if (err) {
+              return returnError(res, "Cannot Register " + err);
+            } else {
+              body.password = "*******";
+              return returnData(res, body);
+            }
+          });
+        }
+      } else {
+        return returnError(res, "Info not detected");
+      }
+    } catch (error) {
+      return returnError(res, "Error " + error);
     }
-  } catch (error) {
-    return returnError(res, "Error " + error);
   }
-});
+);
 
 /**
  * @swagger
@@ -1677,46 +1599,34 @@ router.post("/getDetailedMessages", auth, async function (req, res) {
  *       500:
  *         description: Internal server error
  */
-router.post("/sendMessage", async function (req, res) {
+router.post("/sendMessage", auth, async function (req, res) {
   try {
     const message = Message(req.body);
     if (message) {
       const currentTimestampInMilliseconds = new Date().getTime();
       message.id = crypto.randomUUID();
-      message.userID = req.user.userID;
+      message.providerID = req.user.userID;
       message.senderID = req.user.userID;
       message.msgDate = currentTimestampInMilliseconds;
-      message.conversationId = `${req.user.userID}_${message.providerID}`;
-      await message.save();
+      message.save(function (err) {
+        if (err) {
+          return returnError(res, "Failed" + err);
+        } else {
+          sendNotification(
+            message.userID,
+            "New Message",
+            "You have new message",
+            "PROV_Message"
+          );
 
-      // Emit Socket.IO event
-      req.app.get("io").to(message.conversationId).emit("newMessage", message);
-
-      sendNotification(
-        message.providerID,
-        "New Message",
-        "You have new message",
-        "Message"
-      );
-
-      return returnData(res, message);
+          return returnData(res, message);
+        }
+      });
     } else {
       return returnError(res, "Data Not Correct");
     }
   } catch (err) {
     return returnError(res, "Data Not Correct");
-  }
-});
-
-router.get("/getConversation/:conversationId", auth, async function (req, res) {
-  try {
-    const conversationId = req.params.conversationId;
-    const messages = await Message.find({
-      conversationId: conversationId,
-    }).sort("msgDate");
-    return returnData(res, messages);
-  } catch (err) {
-    return returnError(res, "Error fetching conversation: " + err.message);
   }
 });
 
